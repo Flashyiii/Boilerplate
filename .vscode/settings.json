@@ -1,0 +1,18 @@
+{
+	"stylua.targetReleaseVersion": "latest",
+	"workbench.editor.customLabels.patterns": {
+		"**/init.lua": "${dirname} (${filename}.${extname})",
+		"**/init.luau": "${dirname} (${filename}.${extname})",
+		"**/Client.luau": "${dirname}${filename}.${extname}",
+		"**/Server.luau": "${dirname}${filename}.${extname}",
+		"**/Utils.luau": "${dirname}${filename}.${extname}"
+	},
+	"files.exclude": {
+		"**/.git": true,
+		"**/.svn": true,
+		"**/.hg": true,
+		"**/.DS_Store": true,
+		"**/Thumbs.db": true
+	},
+	"hide-files.files": []
+}

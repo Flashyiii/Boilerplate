@@ -1,0 +1,91 @@
+{
+	"name": "boilerplate",
+	"tree": {
+		"$className": "DataModel",
+		"ReplicatedStorage": {
+			"Shared": {
+				"$className": "Folder",
+				"Services": {
+					"$className": "Folder",
+					"CommandService": {
+						"$className": "Folder",
+						"CommandServiceClient": {
+							"$path": "src/services/CommandService/Client.luau"
+						}
+					},
+					"ExampleService": {
+						"$className": "Folder",
+						"ExampleServiceClient": {
+							"$path": "src/services/ExampleService/Client.luau"
+						},
+						"ExampleServiceUtils": {
+							"$path": "src/services/ExampleService/Utils.luau"
+						}
+					}
+				},
+				"Classes": {
+					"$className": "Folder"
+				},
+				"Modules": {
+					"$className": "Folder",
+					"Commands": {
+						"$className": "Folder",
+						"Datastore": {
+							"$path": "src/Modules/Commands/Datastore.luau"
+						}
+					},
+					"Core": {
+						"$className": "Folder",
+						"DataTemplate": {
+							"$path": "src/Modules/Core/DataTemplate.luau"
+						}
+					}
+				}
+			},
+			"Packages": {
+				"$path": "Packages"
+			},
+			"UI": {
+				"$path": "src/ui"
+			}
+		},
+		"ServerScriptService": {
+			"Server": {
+				"$path": "src/startup/Server.server.luau"
+			},
+			"Services": {
+				"$className": "Folder",
+				"CommandService": {
+					"$className": "Folder",
+					"CommandServiceServer": {
+						"$path": "src/services/CommandService/Server.luau"
+					}
+				},
+				"ExampleService": {
+					"$className": "Folder",
+					"ExampleServiceServer": {
+						"$path": "src/services/ExampleService/Server.luau"
+					}
+				}
+			},
+			"Classes": {
+				"$className": "Folder"
+			},
+			"Modules": {
+				"$className": "Folder"
+			}
+		},
+		"ServerStorage": {
+			"ServerPackages": {
+				"$path": "ServerPackages"
+			}
+		},
+		"StarterPlayer": {
+			"StarterPlayerScripts": {
+				"Client": {
+					"$path": "src/startup/Client.client.luau"
+				}
+			}
+		}
+	}
+}
