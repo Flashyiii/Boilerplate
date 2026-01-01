@@ -1,91 +1,179 @@
 {
-	"name": "boilerplate",
-	"tree": {
-		"$className": "DataModel",
-		"ReplicatedStorage": {
-			"Shared": {
-				"$className": "Folder",
-				"Services": {
-					"$className": "Folder",
-					"CommandService": {
-						"$className": "Folder",
-						"CommandServiceClient": {
-							"$path": "src/services/CommandService/Client.luau"
-						}
-					},
-					"ExampleService": {
-						"$className": "Folder",
-						"ExampleServiceClient": {
-							"$path": "src/services/ExampleService/Client.luau"
-						},
-						"ExampleServiceUtils": {
-							"$path": "src/services/ExampleService/Utils.luau"
-						}
-					}
-				},
-				"Classes": {
-					"$className": "Folder"
-				},
-				"Modules": {
-					"$className": "Folder",
-					"Commands": {
-						"$className": "Folder",
-						"Datastore": {
-							"$path": "src/Modules/Commands/Datastore.luau"
-						}
-					},
-					"Core": {
-						"$className": "Folder",
-						"DataTemplate": {
-							"$path": "src/Modules/Core/DataTemplate.luau"
-						}
-					}
-				}
-			},
-			"Packages": {
-				"$path": "Packages"
-			},
-			"UI": {
-				"$path": "src/ui"
-			}
-		},
-		"ServerScriptService": {
-			"Server": {
-				"$path": "src/startup/Server.server.luau"
-			},
-			"Services": {
-				"$className": "Folder",
-				"CommandService": {
-					"$className": "Folder",
-					"CommandServiceServer": {
-						"$path": "src/services/CommandService/Server.luau"
-					}
-				},
-				"ExampleService": {
-					"$className": "Folder",
-					"ExampleServiceServer": {
-						"$path": "src/services/ExampleService/Server.luau"
-					}
-				}
-			},
-			"Classes": {
-				"$className": "Folder"
-			},
-			"Modules": {
-				"$className": "Folder"
-			}
-		},
-		"ServerStorage": {
-			"ServerPackages": {
-				"$path": "ServerPackages"
-			}
-		},
-		"StarterPlayer": {
-			"StarterPlayerScripts": {
-				"Client": {
-					"$path": "src/startup/Client.client.luau"
-				}
-			}
-		}
-	}
+  "name": "boilerplate",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "Shared": {
+        "$className": "Folder",
+        "Services": {
+          "$className": "Folder",
+          "CommandService": {
+            "$className": "Folder",
+            "CommandServiceClient": {
+              "$path": "src/services/CommandService/Client.luau"
+            }
+          },
+          "RagdollService": {
+            "$className": "Folder",
+            "RagdollServiceClient": {
+              "$path": "src/services/RagdollService/Client.luau"
+            },
+            "Util": {
+              "$path": "src/services/RagdollService/Util.luau"
+            }
+          },
+          "SpawnService": {
+            "$className": "Folder",
+            "SpawnServiceClient": {
+              "$path": "src/services/SpawnService/Client.luau"
+            }
+          }
+        },
+        "Classes": {
+          "$className": "Folder"
+        },
+        "Modules": {
+          "$className": "Folder",
+          "Assets": {
+            "$className": "Folder",
+            "Animations": {
+              "$path": "src/Modules/Assets/Animations.luau"
+            },
+            "Sounds": {
+              "$path": "src/Modules/Assets/Sounds.luau"
+            }
+          },
+          "Commands": {
+            "$className": "Folder",
+            "Datastore": {
+              "$path": "src/Modules/Commands/Datastore.luau"
+            },
+            "Testing": {
+              "$path": "src/Modules/Commands/Testing.luau"
+            }
+          },
+          "Core": {
+            "$className": "Folder",
+            "CharacterData": {
+              "$className": "Folder",
+              "DefaultStats": {
+                "$path": "src/Modules/Core/CharacterData/DefaultStats.luau"
+              }
+            },
+            "DataTemplate": {
+              "$path": "src/Modules/Core/DataTemplate.luau"
+            },
+            "GameData": {
+              "$className": "Folder",
+              "SkillData": {
+                "$path": "src/Modules/Core/GameData/SkillData.luau"
+              }
+            }
+          },
+          "Game": {
+            "$className": "Folder",
+            "ClientUtil": {
+              "$path": "src/Modules/Game/ClientUtil.luau"
+            },
+            "KnockbackHandler": {
+              "$path": "src/Modules/Game/KnockbackHandler.luau"
+            },
+            "Preloader": {
+              "$path": "src/Modules/Game/Preloader.luau"
+            }
+          }
+        },
+        "Visuals": {
+          "$path": "src/visuals"
+        },
+        "WCS": {
+          "$path": "src/wcs"
+        },
+        "Wcs": {
+          "$className": "Folder",
+          "Conditions": {
+            "$className": "Folder",
+            "States": {
+              "$className": "Folder",
+              "Busy": {
+                "$path": "src/wcs/Conditions/States/Busy.luau"
+              },
+              "EndLag": {
+                "$path": "src/wcs/Conditions/States/EndLag.luau"
+              },
+              "IFrame": {
+                "$path": "src/wcs/Conditions/States/IFrame.luau"
+              },
+              "Ragdoll": {
+                "$path": "src/wcs/Conditions/States/Ragdoll.luau"
+              },
+              "Running": {
+                "$path": "src/wcs/Conditions/States/Running.luau"
+              },
+              "Stun": {
+                "$path": "src/wcs/Conditions/States/Stun.luau"
+              }
+            }
+          },
+          "Core": {
+            "$className": "Folder",
+            "SkillBase": {
+              "$path": "src/wcs/Core/SkillBase.luau"
+            }
+          },
+          "Skills": {
+            "$className": "Folder",
+            "Dash": {
+              "$path": "src/wcs/Skills/Dash.luau"
+            }
+          }
+        }
+      },
+      "Packages": {
+        "$path": "Packages"
+      },
+      "UI": {
+        "$path": "src/ui"
+      }
+    },
+    "ServerScriptService": {
+      "Server": {
+        "$path": "src/startup/Server.server.luau"
+      },
+      "Services": {
+        "$className": "Folder",
+        "CommandService": {
+          "$className": "Folder",
+          "CommandServiceServer": {
+            "$path": "src/services/CommandService/Server.luau"
+          }
+        },
+        "SpawnService": {
+          "$className": "Folder",
+          "SpawnServiceServer": {
+            "$path": "src/services/SpawnService/Server.luau"
+          }
+        },
+        "StatService": {
+          "$className": "Folder",
+          "StatServiceServer": {
+            "$path": "src/services/StatService/Server.luau"
+          }
+        }
+      },
+      "Classes": {
+        "$className": "Folder"
+      },
+      "Modules": {
+        "$className": "Folder"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Client": {
+          "$path": "src/startup/Client.client.luau"
+        }
+      }
+    }
+  }
 }

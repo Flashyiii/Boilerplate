@@ -1,0 +1,88 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+
+local conch = require(ReplicatedStorage.Packages.conch)
+local wcs = require(ReplicatedStorage.Packages.wcs)
+local Dash = require(ReplicatedStorage.Shared.WCS.Skills.Dash)
+
+local Testing = {}
+
+conch.register("Knockback", {
+	description = "Apply Knockback to a Player",
+	permissions = { "Knockback" },
+	arguments = function()
+		return conch.args.player("target", "Target"),
+			conch.args.player("attacker", "Attacker"),
+			conch.args.number("speed", "Knockback Speed"),
+			conch.args.number("time", "Knockback Time")
+	end,
+
+	callback = function(target, attacker, speed, time)
+		local KnockbackHandler = require(ReplicatedStorage.Shared.Modules.Game.KnockbackHandler)
+
+		local targetCharacter = target.Character
+		local attackerCharacter = attacker.Character
+
+		if targetCharacter and attackerCharacter then
+			KnockbackHandler.Knockback(attackerCharacter, targetCharacter, {
+				Speed = speed,
+				Time = time,
+				Relative = "Attacker",
+			})
+		end
+	end,
+})
+
+conch.register("Ragdoll", {
+	description = "Ragdoll a Player",
+	permissions = { "Ragdoll" },
+	arguments = function()
+		return conch.args.player("target", "Target"), conch.args.number("time", "Ragdoll Time")
+	end,
+
+	callback = function(target, time)
+		local TargetCharacter = target.Character
+		if TargetCharacter then
+			local Target = wcs.Character.GetCharacterFromInstance(TargetCharacter)
+			local RagdollStatus = require(ReplicatedStorage.Shared.WCS.Conditions.States.Ragdoll)
+			local Ragdoll = RagdollStatus.new(Target)
+			Ragdoll:Start(time)
+		end
+	end,
+})
+
+conch.register("Run", {
+	description = "Make a Player Run",
+	permissions = { "Run" },
+	arguments = function()
+		return conch.args.player("target", "Target"), conch.args.number("time", "Run Time")
+	end,
+
+	callback = function(target, time)
+		local TargetCharacter = target.Character
+		if TargetCharacter then
+			local Target = wcs.Character.GetCharacterFromInstance(TargetCharacter)
+			local RunningStatus = require(ReplicatedStorage.Shared.WCS.Conditions.States.Running)
+			local Running = RunningStatus.new(Target)
+			Running:Start(time)
+		end
+	end,
+})
+
+conch.register("Dash", {
+	description = "Make a Player Dash",
+	permissions = { "Dash" },
+	arguments = function()
+		return conch.args.player("target", "Target")
+	end,
+
+	callback = function(target)
+		local TargetCharacter = target.Character
+		if TargetCharacter then
+			local Target = wcs.Character.GetCharacterFromInstance(TargetCharacter)
+			Target:GetSkillFromConstructor(Dash):Start()
+		end
+	end,
+})
+
+return Testing

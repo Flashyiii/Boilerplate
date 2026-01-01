@@ -3,7 +3,29 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local DataService = require(game:GetService("ReplicatedStorage").Packages.dataservice).server
+local wcs = require(ReplicatedStorage.Packages.wcs)
 local DataTemplate = require(ReplicatedStorage.Shared.Modules.Core.DataTemplate)
+
+_G.SaveData = false
+_G.Beta = true
+_G.Debug = true
+
+local ProfileStoreIndex = "Production"
+
+if game:GetService("RunService"):IsStudio() then
+	ProfileStoreIndex = "Development"
+end
+
+DataService:init({
+	template = DataTemplate,
+	profileStoreIndex = ProfileStoreIndex,
+	useMock = false,
+	resetData = _G.SaveData,
+})
+
+local Server = wcs.CreateServer()
+Server:RegisterDirectory(ReplicatedStorage.Shared.WCS)
+Server:Start()
 
 local Services = {}
 
@@ -51,21 +73,6 @@ end
 
 init()
 
-_G.SaveData = false
-
-local ProfileStoreIndex = "Production"
-
-if game:GetService("RunService"):IsStudio() then
-	ProfileStoreIndex = "Development"
-end
-
-DataService:init({
-	template = DataTemplate,
-	profileStoreIndex = ProfileStoreIndex,
-	useMock = false,
-	resetData = _G.SaveData,
-})
-
 function DataService:onPlayerInit(player: Player, data): ()
 	local Information = data.Information
 
@@ -77,10 +84,12 @@ function DataService:onPlayerInit(player: Player, data): ()
 	Information.TimesSeen += 1
 
 	player:SetAttribute("ProfileLoaded", true)
+
 	HandlePlayer(player)
 end
 
-function DataService:onPlayerRemoving(_: Player, data): ()
+DataService:addPlayerRemovingCallback(function(player: Player, data)
+	warn("Disconnecting Player : ", player)
 	local Information = data.Information
 	Information.PlayTime += os.time() - Information.LastJoined
-end
+end)

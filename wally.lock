@@ -33,13 +33,13 @@ version = "0.3.1"
 dependencies = []
 
 [[package]]
-name = "evaera/promise"
-version = "4.0.0"
+name = "cheetiedotpy/wcs"
+version = "2.5.0"
 dependencies = []
 
 [[package]]
-name = "firebird702/profileservice"
-version = "1.1.0"
+name = "evaera/promise"
+version = "4.0.0"
 dependencies = []
 
 [[package]]
@@ -50,11 +50,16 @@ dependencies = []
 [[package]]
 name = "flashyi/boilerplate"
 version = "0.1.0"
-dependencies = [["Promise", "evaera/promise@4.0.0"], ["Signal", "sleitnick/signal@2.0.3"], ["camerashaker", "brittonfischer/camerashaker@0.1.0"], ["charm", "neohertz/charm@0.11.0"], ["conch", "alicesaidhi/conch@0.3.1"], ["conch_ui", "alicesaidhi/conch-ui@0.3.1"], ["dataservice", "leifstout/dataservice@0.3.2"], ["debug", "howmanysmall/debug@1.0.1"], ["hitbox", "flashyiii/hitbox@0.0.5"], ["maid", "flamenco687/maid@3.2.2"], ["observer", "tazmondo/observer@0.3.4"], ["packet", "sjdinsd/packet@0.1.91"], ["refx", "wad4444/refx@0.3.3"], ["replica", "ayrezrblx/replica@0.1.9"], ["ripple", "littensy/ripple@0.9.3"], ["ProfileService", "firebird702/profileservice@1.1.0"]]
+dependencies = [["Promise", "evaera/promise@4.0.0"], ["Signal", "sleitnick/signal@2.0.3"], ["camerashaker", "brittonfischer/camerashaker@0.1.0"], ["charm", "neohertz/charm@0.11.0"], ["conch", "alicesaidhi/conch@0.3.1"], ["conch_ui", "alicesaidhi/conch-ui@0.3.1"], ["dataservice", "leifstout/dataservice@0.4.0"], ["debug", "howmanysmall/debug@1.0.1"], ["hitbox", "flashyiii/hitbox@0.0.5"], ["maid", "flamenco687/maid@3.2.2"], ["networker", "leifstout/networker@0.3.0"], ["observer", "tazmondo/observer@0.3.4"], ["refx", "wad4444/refx@0.3.3"], ["replica", "ayrezrblx/replica@0.1.9"], ["ripple", "littensy/ripple@0.9.3"], ["swagtext", "flashyiii/swagtext@0.1.0"], ["wcs", "cheetiedotpy/wcs@2.5.0"], ["zoneplus", "mattschrubb/zoneplus@3.2.0"]]
 
 [[package]]
 name = "flashyiii/hitbox"
 version = "0.0.5"
+dependencies = []
+
+[[package]]
+name = "flashyiii/swagtext"
+version = "0.1.0"
 dependencies = []
 
 [[package]]
@@ -74,12 +79,17 @@ dependencies = [["Promise", "evaera/promise@4.0.0"]]
 
 [[package]]
 name = "leifstout/dataservice"
-version = "0.3.2"
+version = "0.4.0"
 dependencies = [["Janitor", "howmanysmall/janitor@1.18.3"], ["Networker", "leifstout/networker@0.2.1"], ["ProfileStore", "lm-loleris/profilestore@1.0.3"], ["Signal", "sleitnick/signal@2.0.3"]]
 
 [[package]]
 name = "leifstout/networker"
 version = "0.2.1"
+dependencies = [["Signal", "sleitnick/signal@2.0.3"]]
+
+[[package]]
+name = "leifstout/networker"
+version = "0.3.0"
 dependencies = [["Signal", "sleitnick/signal@2.0.3"]]
 
 [[package]]
@@ -98,6 +108,11 @@ version = "1.0.3"
 dependencies = []
 
 [[package]]
+name = "mattschrubb/zoneplus"
+version = "3.2.0"
+dependencies = []
+
+[[package]]
 name = "neohertz/charm"
 version = "0.11.0"
 dependencies = []
@@ -105,11 +120,6 @@ dependencies = []
 [[package]]
 name = "osyrisrblx/t"
 version = "3.1.1"
-dependencies = []
-
-[[package]]
-name = "sjdinsd/packet"
-version = "0.1.91"
 dependencies = []
 
 [[package]]

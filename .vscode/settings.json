@@ -14,5 +14,6 @@
 		"**/.DS_Store": true,
 		"**/Thumbs.db": true
 	},
-	"hide-files.files": []
+	"hide-files.files": [],
+	"luau-lsp.plugin.port": 3669
 }

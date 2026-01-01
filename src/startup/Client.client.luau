@@ -3,6 +3,15 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local dataservice = require(ReplicatedStorage.Packages.dataservice).client
 dataservice:init()
 
+local Preloader = require(ReplicatedStorage.Shared.Modules.Game.Preloader)
+Preloader.Start()
+
+local WCS = require(ReplicatedStorage.Packages.wcs)
+local Client = WCS.CreateClient()
+Client:RegisterDirectory(ReplicatedStorage.Shared.WCS)
+
+Client:Start()
+
 local Services = {}
 local function initclient(): ()
 	for _, moduleScript in ipairs(ReplicatedStorage.Shared.Services:GetDescendants()) do

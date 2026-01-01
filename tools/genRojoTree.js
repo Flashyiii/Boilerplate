@@ -57,7 +57,10 @@ const tree = {
         $className: "Folder",
         Services: { $className: "Folder", },
         Classes: {  $className: "Folder", },
-        Modules: { $className: "Folder", }
+        Modules: { $className: "Folder", },
+        Visuals : { $path: "src/visuals",  },
+        WCS : { $path: "src/wcs",  },
+
       },
       Packages: { $path: "Packages", },
       UI: { $path: "src/ui", },
@@ -68,10 +71,6 @@ const tree = {
       Services: { $className: "Folder", },
       Classes: { $className: "Folder", },
       Modules: { $className: "Folder", },
-    },
-
-    ServerStorage: {
-      ServerPackages: { $path: "ServerPackages", },
     },
 
     StarterPlayer: {
