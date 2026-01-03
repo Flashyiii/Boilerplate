@@ -1,5 +1,6 @@
 local RepStorage = game:GetService("ReplicatedStorage")
 local Debris = game:GetService("Debris")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RNG = Random.new()
 
 local _CurrentCamera = workspace.CurrentCamera
@@ -8,7 +9,9 @@ local FloorWhitelist = RaycastParams.new()
 FloorWhitelist.FilterType = Enum.RaycastFilterType.Include
 FloorWhitelist.FilterDescendantsInstances = { workspace.Map }
 
-local ClientUtil = {}
+local ClientUtil = {
+	AllAnimations = {},
+}
 
 export type TweenEasingTypes =
 	"Sine"
@@ -26,6 +29,7 @@ export type TweenDirectionTypes = "In" | "Out" | "InOut"
 local clientLoops = {}
 
 local SoundData = require(RepStorage.Shared.Modules.Assets.Sounds)
+local Animations = require(ReplicatedStorage.Shared.Modules.Assets.Animations)
 local AnimationData = nil
 do
 	local shared = RepStorage:FindFirstChild("Shared")
@@ -50,13 +54,22 @@ local _soundCache = {} -- name -> template Sound
 local _activeSounds = {} -- list of playing sounds
 
 local _animCache = {} -- name -> template Animation
+local _animIdCache = {} -- animationId -> template Animation (for direct animation ID loading)
+local _animatorCache = {} -- target -> animator (cache animators per model to avoid repeated searching)
+local _activeAnimations = {} -- list of { track = AnimationTrack, name = string, target = Model, conn = RBXScriptConnection }
 
-local function _getSoundId(name: string)
+local function _getSoundId(name: string, weaponName: string?)
+	if weaponName and type(weaponName) == "string" then
+		local combo = weaponName .. "-" .. name
+		if SoundData and SoundData[combo] then
+			return SoundData[combo], combo
+		end
+	end
 	if SoundData and SoundData[name] then
-		return SoundData[name]
+		return SoundData[name], name
 	end
 	warn(("Sound %q not found in SoundData."):format(name))
-	return ""
+	return "", name
 end
 
 function ClientUtil.PlaySound(SoundName: string, PlaceToPlay: Instance | CFrame, Options: any?)
@@ -67,18 +80,19 @@ function ClientUtil.PlaySound(SoundName: string, PlaceToPlay: Instance | CFrame,
 	local pitch = Options.Pitch or 1
 	local timePosition = Options.TimePosition
 
-	local soundId = _getSoundId(SoundName)
+	local Moveset = Options.Moveset or Options.Weapon
+	local soundId, resolvedName = _getSoundId(SoundName, Moveset)
 	if soundId == "" then
 		return
 	end
 
-	local template = _soundCache[SoundName]
+	local template = _soundCache[resolvedName]
 	if not template then
 		template = Instance.new("Sound")
-		template.Name = SoundName
+		template.Name = resolvedName
 		template.SoundId = tostring(soundId)
 		template.Volume = 1
-		_soundCache[SoundName] = template
+		_soundCache[resolvedName] = template
 	end
 
 	local sound = template:Clone()
@@ -128,7 +142,6 @@ function ClientUtil.PlaySound(SoundName: string, PlaceToPlay: Instance | CFrame,
 		end)
 	end)
 
-	warn("[ClientUtil] Played Sound:", SoundName, "in", tick() - startTime, "seconds")
 	sound:Play()
 
 	if not looped and createdParent then
@@ -138,33 +151,37 @@ function ClientUtil.PlaySound(SoundName: string, PlaceToPlay: Instance | CFrame,
 	return sound
 end
 
-function ClientUtil.StopSound(SoundOrName: any, Time: number?)
+function ClientUtil.StopSound(SoundOrName: any, Time: number?) -- TODO: Apply to all sounds with that name
 	if typeof(SoundOrName) == "string" then
 		local name = SoundOrName
 		for i = #_activeSounds, 1, -1 do
 			local s = _activeSounds[i]
-			if s and s.Name == name then
-				if Time and Time > 0 then
-					task.spawn(function()
-						local startVol = s.Volume
-						local steps = math.max(1, math.floor(Time / 0.05))
-						for j = 1, steps do
-							if not s.Parent then
-								break
+			if s then
+				local match = (s.Name == name)
+					or (s.Name:sub(-#name) == name and s.Name:sub(-(#name + 1), -(#name + 1)) == "-")
+				if match then
+					if Time and Time > 0 then
+						task.spawn(function()
+							local startVol = s.Volume
+							local steps = math.max(1, math.floor(Time / 0.05))
+							for j = 1, steps do
+								if not s.Parent then
+									break
+								end
+								s.Volume = startVol * (1 - j / steps)
+								task.wait(0.05)
 							end
-							s.Volume = startVol * (1 - j / steps)
-							task.wait(0.05)
-						end
-						if s.Parent then
-							s:Stop()
-							s:Destroy()
-						end
-					end)
-				else
-					s:Stop()
-					s:Destroy()
+							if s.Parent then
+								s:Stop()
+								s:Destroy()
+							end
+						end)
+					else
+						s:Stop()
+						s:Destroy()
+					end
+					table.remove(_activeSounds, i)
 				end
-				table.remove(_activeSounds, i)
 			end
 		end
 	elseif typeof(SoundOrName) == "Instance" and SoundOrName:IsA("Sound") then
@@ -197,90 +214,238 @@ function ClientUtil.StopSound(SoundOrName: any, Time: number?)
 	end
 end
 
--- Animation helpers (name-based)
-local function _getAnimationId(name: string)
-	if AnimationData and AnimationData[name] then
-		return AnimationData[name]
+--* Animation Functions
+
+ClientUtil.Animations = Animations
+local AnimationCache = {}
+setmetatable(AnimationCache, { __mode = "k" }) -- Weak keys so characters can be garbage collected
+
+local MAX_CACHED_TRACKS = 50
+local function GetAnimator(character: Model): Animator?
+	for _, descendant in character:GetDescendants() do
+		if descendant:IsA("Animator") then
+			return descendant
+		end
 	end
-	warn(("Animation %q not found in AnimationData."):format(name))
-	return ""
+
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	if humanoid then
+		local animator = humanoid:FindFirstChildOfClass("Animator")
+		if animator then
+			return animator
+		end
+
+		local newAnimator = Instance.new("Animator")
+		newAnimator.Parent = humanoid
+		return newAnimator
+	end
+
+	return nil
 end
 
-function ClientUtil.LoadAnimationByName(Name: string, Target: Model): AnimationTrack?
-	local animId = _getAnimationId(Name)
-	if animId == "" then
-		return nil
-	end
-	local template = _animCache[Name]
-	if not template then
-		template = Instance.new("Animation")
-		template.Name = Name
-		template.AnimationId = tostring(animId)
-		_animCache[Name] = template
-	end
-	return ClientUtil.LoadAnimation(template, Target)
-end
-
-function ClientUtil.PlayAnimation(Name: string, Target: Model, Speed: number?)
-	local track = ClientUtil.LoadAnimationByName(Name, Target)
-	if not track then
-		return nil
-	end
-
-	if Speed then
-		track:Play(nil, nil, Speed)
-	else
-		track:Play()
-	end
-	return track
-end
-
-function ClientUtil.AddClientLoop(LoopFunc: any, LoopID: any)
-	if type(LoopFunc) ~= "function" then
+-- Helper function to clean up old/stopped animations for a character
+local function CleanupOldTracks(character: Model)
+	local cache = AnimationCache[character]
+	if not cache then
 		return
 	end
 
-	local function LoopCallback(DeltaTime: number)
-		local FuntionResult = LoopFunc(DeltaTime)
-		if FuntionResult == true then
-			clientLoops[LoopID] = nil
-			return
+	local stoppedTracks = {}
+
+	for animName, track in cache do
+		if not track.IsPlaying then
+			table.insert(stoppedTracks, animName)
 		end
 	end
 
-	clientLoops[LoopID] = LoopCallback
+	-- Remove stopped tracks from cache
+	for _, animName in stoppedTracks do
+		local track = cache[animName]
+		track:Destroy()
+		cache[animName] = nil
+	end
 end
 
-function ClientUtil.LoadAndPlayAnimation(Animation: Animation, Target: Model, Speed: number?)
-	if Animation.AnimationId == "" then
+-- Get or create AnimationTrack for a character
+local function GetOrLoadTrack(animationName: string, character: Model): AnimationTrack?
+	-- Initialize cache for this character if needed
+	if not AnimationCache[character] then
+		AnimationCache[character] = {}
+	end
+
+	local cache = AnimationCache[character]
+
+	-- Return cached track if it exists
+	if cache[animationName] then
+		return cache[animationName]
+	end
+
+	-- Check if we need to cleanup before loading new animation
+	local trackCount = 0
+	for _ in cache do
+		trackCount = trackCount + 1
+	end
+
+	if trackCount >= MAX_CACHED_TRACKS then
+		CleanupOldTracks(character)
+	end
+
+	-- Get animation ID
+	local animationId = ClientUtil.Animations[animationName]
+	if not animationId then
+		warn("Animation not found: " .. animationName)
 		return nil
 	end
-	local TargetAnimation = ClientUtil.LoadAnimation(Animation, Target)
-	if Speed then
-		TargetAnimation:Play(nil, nil, Speed)
-	else
-		TargetAnimation:Play()
+
+	-- Find animator
+	local animator = GetAnimator(character)
+	if not animator then
+		local charName = typeof(character) == "Instance" and character.Name or tostring(character)
+		warn("No Animator or Humanoid found in character: " .. charName)
+		return nil
 	end
-	return TargetAnimation
+
+	-- Create and load animation
+	local animationInstance = Instance.new("Animation")
+	animationInstance.AnimationId = animationId
+
+	local track: AnimationTrack = nil
+	if animator:IsA("Animator") then
+		track = animator:LoadAnimation(animationInstance)
+	end
+
+	animationInstance:Destroy() -- Clean up the temporary instance
+
+	if track then
+		cache[animationName] = track
+
+		track.Destroying:Connect(function()
+			if cache[animationName] == track then
+				cache[animationName] = nil
+			end
+		end)
+	end
+
+	return track
 end
 
-function ClientUtil.LoadAnimation(Animation: Animation, Target: Model): AnimationTrack?
-	if Animation.AnimationId == "" then
-		return nil
-	end
-	local NewAnim = Instance.new("Animation")
-	NewAnim.AnimationId = Animation.AnimationId
-
-	local LoadedAnimation: AnimationTrack = nil
-	for _, chil in Target:GetDescendants() do
-		if chil:IsA("Animator") then
-			print("Animator found, loading animation:", Animation.Name, "on", chil)
-			LoadedAnimation = chil:LoadAnimation(NewAnim)
-			break
+local function GetAnimationName(baseAnimName: string, moveset: string?): string
+	if moveset then
+		local movesetAnimName = moveset .. "-" .. baseAnimName
+		if ClientUtil.Animations[movesetAnimName] then
+			return movesetAnimName
 		end
 	end
 
-	return LoadedAnimation
+	return baseAnimName
+end
+
+function ClientUtil.PlayAnimation(animName: string, character: Model, moveset: string?, speed: number?)
+	local fullAnimName = GetAnimationName(animName, moveset)
+	local track = GetOrLoadTrack(fullAnimName, character)
+
+	if track then
+		if not track.IsPlaying then
+			if speed then
+				track:Play(0, 1, speed)
+			else
+				track:Play()
+			end
+		end
+		return track
+	end
+
+	return nil
+end
+
+function ClientUtil.StopAnimation(animName: string, character: Model, fadeTime: number?)
+	local cache = AnimationCache[character]
+	if not cache then
+		return
+	end
+
+	local fade = fadeTime or 0.1
+
+	for cachedAnimName, track in cache do
+		if cachedAnimName == animName or cachedAnimName:match("%-" .. animName .. "$") then
+			if track.IsPlaying then
+				track:Stop(fade)
+			end
+		end
+	end
+end
+
+function ClientUtil.StopAllAnimations(character: Model, fadeTime: number?)
+	local cache = AnimationCache[character]
+	if not cache then
+		return
+	end
+
+	local fade = fadeTime or 0.1
+
+	for _, track in cache do
+		if track.IsPlaying then
+			track:Stop(fade)
+		end
+	end
+end
+
+function ClientUtil.LoadAnimation(animName: string | Animation, character: Model, moveset: string?): AnimationTrack?
+	if typeof(animName) == "Instance" and animName:IsA("Animation") then
+		local animator = GetAnimator(character)
+		if not animator then
+			local charName = typeof(character) == "Instance" and character.Name or tostring(character)
+			warn("No Animator or Humanoid found in character: " .. charName)
+			return nil
+		end
+
+		local track: AnimationTrack = nil
+		if animator:IsA("Animator") then
+			track = animator:LoadAnimation(animName)
+		end
+
+		return track
+	end
+
+	local fullAnimName = GetAnimationName(animName, moveset)
+	local track = GetOrLoadTrack(fullAnimName, character)
+
+	return track
+end
+
+function ClientUtil.GetAnimationTrack(animName: string, character: Model, moveset: string?): AnimationTrack?
+	local fullAnimName = GetAnimationName(animName, moveset)
+	local cache = AnimationCache[character]
+
+	if cache then
+		return cache[fullAnimName]
+	end
+
+	return nil
+end
+
+function ClientUtil.IsAnimationPlaying(animName: string, character: Model, moveset: string?): boolean
+	local fullAnimName = GetAnimationName(animName, moveset)
+	local cache = AnimationCache[character]
+
+	if cache and cache[fullAnimName] then
+		return cache[fullAnimName].IsPlaying
+	end
+
+	return false
+end
+
+function ClientUtil.CleanupCharacterAnimations(character: Model)
+	local cache = AnimationCache[character]
+	if not cache then
+		return
+	end
+
+	for _, track in cache do
+		track:Destroy()
+	end
+
+	AnimationCache[character] = nil
 end
 
 function ClientUtil.Weld(BasePart: BasePart, BasePart2: BasePart, C0: CFrame?, C1: CFrame?)

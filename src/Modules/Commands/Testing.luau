@@ -85,4 +85,22 @@ conch.register("Dash", {
 	end,
 })
 
+conch.register("Summon", {
+	description = "Make a Player Summon",
+	permissions = { "Summon" },
+	arguments = function()
+		return conch.args.player("target", "Target")
+	end,
+
+	callback = function(target)
+		local Summon = require(ReplicatedStorage.Shared.WCS.Skills.Summon)
+
+		local TargetCharacter = target.Character
+		if TargetCharacter then
+			local Target = wcs.Character.GetCharacterFromInstance(TargetCharacter)
+			Target:GetSkillFromConstructor(Summon):Start()
+		end
+	end,
+})
+
 return Testing

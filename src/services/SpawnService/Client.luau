@@ -35,10 +35,16 @@ end
 
 function SpawnServiceClient._rotateCamera(self: SpawnServiceClient)
 	local Character = Players.LocalPlayer.Character or Players.LocalPlayer.CharacterAdded:Wait()
+	local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+
+	if Character:GetAttribute("Ragdoll") then
+		Humanoid.AutoRotate = false
+
+		return
+	end
 
 	local Camera = workspace.CurrentCamera
 	local HumanoidRootPart = Character.HumanoidRootPart
-	local Humanoid = Character:FindFirstChildOfClass("Humanoid")
 
 	if Humanoid and Humanoid.AutoRotate then
 		Humanoid.AutoRotate = true
@@ -68,7 +74,7 @@ function SpawnServiceClient._shiftLock(self: SpawnServiceClient)
 
 	local Connection
 	local RunService = game:GetService("RunService")
-
+	local Humanoid = Character:FindFirstChild("Humanoid")
 	if Character:GetAttribute("ShiftLock") == true then
 		Connection = RunService.RenderStepped:Connect(function()
 			self:_rotateCamera()

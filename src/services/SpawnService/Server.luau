@@ -8,11 +8,14 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local StatServiceServer = require(ServerScriptService.Services.StatService.StatServiceServer)
 local wcs = require(ReplicatedStorage.Packages.wcs)
 local Dash = require(ReplicatedStorage.Shared.WCS.Skills.Dash)
+local Summon = require(ReplicatedStorage.Shared.WCS.Skills.Summon)
 local Character = wcs.Character
 
 function SetAttributes(char: Model): ()
 	char:SetAttribute("Loaded", true)
 	char:SetAttribute("TimeStoped", false)
+	char:SetAttribute("Moveset", "TheWorld")
+	char:SetAttribute("CanJump", true)
 end
 
 function SetSkills(char: Model): ()
@@ -26,6 +29,7 @@ function SetSkills(char: Model): ()
 
 	--* Skills
 	Dash.new(WCS_Character)
+	Summon.new(WCS_Character)
 end
 
 function Char(char: Model): ()

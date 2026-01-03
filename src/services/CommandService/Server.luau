@@ -22,7 +22,6 @@ end
 
 function CommandServiceServer.initPlayer(player: Player): ()
 	if RunService:IsStudio() then
-		print(player)
 		dataservice:set(player, { "Group" }, "super-user", true)
 	else
 		for _, v in pairs(super_admins) do
@@ -35,7 +34,6 @@ function CommandServiceServer.initPlayer(player: Player): ()
 
 	local user = conch.get_user(player)
 	conch.give_roles(user, dataservice:get(player, { "Group" }))
-	print(dataservice:get(player))
 end
 
 export type CommandServiceServer = typeof(CommandServiceServer) & {}

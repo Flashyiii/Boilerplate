@@ -1,121 +1,156 @@
 local RepStorage = game:GetService("ReplicatedStorage")
 local ContentProvider = game:GetService("ContentProvider")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
 local ExtraFolder = ReplicatedStorage:WaitForChild("Assets").Load
-
 local ClientUtil = require(RepStorage.Shared.Modules.Game.ClientUtil)
 
 local Preloader = {}
 
 local function CheckId(Id: string): boolean
-	if Id == "" or Id == "rbxassetid://0" then
+	if Id == "" or Id == "rbxassetid://0" or Id == "rbxassetid://" then
 		return false
 	end
 	return true
 end
 
+local function GetAnimationsTable()
+	if ClientUtil.Animations then
+		return ClientUtil.Animations
+	end
+
+	return nil
+end
+
 function Preloader.LoadAnimations()
+	local Animations = GetAnimationsTable()
+
+	if not Animations then
+		warn("Preloader: No Animations table found, skipping animations preload")
+		return
+	end
+
 	local AnimationTable = {}
-	do
-		local Animations = nil
-		do
-			local shared = RepStorage:FindFirstChild("Shared")
-			if shared then
-				local modules = shared:FindFirstChild("Modules")
-				if modules then
-					local assets = modules:FindFirstChild("Assets")
-					if assets then
-						local animModule = assets:FindFirstChild("Animations")
-						if animModule and animModule:IsA("ModuleScript") then
-							local ok, res = pcall(require, animModule)
-							if ok and type(res) == "table" then
-								Animations = res
-							end
-						end
-					end
-				end
-			end
+
+	-- Convert animation table to instances
+	for name, id in pairs(Animations) do
+		if not CheckId(id) then
+			continue
 		end
-		if not Animations then
-			print("Preloader: No Animations table found, skipping animations preload")
-			return
-		end
-		for name, id in pairs(Animations) do
-			if not CheckId(id) then
-				continue
-			end
-			local anim = Instance.new("Animation")
-			anim.Name = name
-			anim.AnimationId = id
-			table.insert(AnimationTable, anim)
-		end
+		local anim = Instance.new("Animation")
+		anim.Name = name
+		anim.AnimationId = id
+		table.insert(AnimationTable, anim)
 	end
 
 	local TotalAnimations = #AnimationTable
 	local LoadedAnimations = 0
+	local FailedAnimations = 0
 	local UseSecondRig = false
 
+	-- Create first rig
 	local Rig = ExtraFolder.R6:Clone()
 	Rig.Parent = workspace.Effects
 
-	for _, Animation in AnimationTable do
+	print(`Preloader: Starting to load {TotalAnimations} animations...`)
+
+	for i, Animation in AnimationTable do
+		-- Switch to second rig after 255 animations to avoid limit
 		if LoadedAnimations >= 255 and not UseSecondRig then
 			UseSecondRig = true
-
 			Rig:Destroy()
 			Rig = ExtraFolder.R6:Clone()
 			Rig.Parent = workspace.Effects
+			print("Preloader: Switching to second rig (255+ animations)")
 		end
 
 		local TimeElapsed = 0
-		local Track
+		local Track = nil
+		local Success = false
+
+		-- Try to load the animation
 		task.spawn(function()
-			Track = ClientUtil.LoadAnimation(Animation, Rig)
+			local ok, result = pcall(function()
+				return ClientUtil.LoadAnimation(Animation, Rig)
+			end)
+			if ok then
+				Track = result
+				Success = true
+			else
+				warn(`Preloader: Failed to load animation {Animation.Name}: {result}`)
+			end
 		end)
 
+		-- Wait for load or timeout
 		repeat
 			TimeElapsed += task.wait()
 		until Track or TimeElapsed >= 10
 
-		LoadedAnimations += 1
+		if Success and Track then
+			LoadedAnimations += 1
 
-		if TimeElapsed >= 10 then
-			continue
+			-- Progress updates every 50 animations
+			if LoadedAnimations % 50 == 0 then
+				print(`Preloader: Loaded {LoadedAnimations}/{TotalAnimations} animations...`)
+			end
+		else
+			FailedAnimations += 1
+			if TimeElapsed >= 10 then
+				warn(`Preloader: Timeout loading animation {Animation.Name}`)
+			end
+		end
+
+		-- Small yield to prevent lag
+		if i % 10 == 0 then
+			task.wait()
 		end
 	end
 
-	print(`Loaded ({LoadedAnimations}/{TotalAnimations}) animations`)
+	-- Cleanup rig
+	Rig:Destroy()
+
+	print(
+		`Preloader: Finished loading animations - Success: {LoadedAnimations}/{TotalAnimations}, Failed: {FailedAnimations}`
+	)
 end
+
 function Preloader.LoadExtra()
 	local toPreload = { RepStorage }
 
-	local shared = RepStorage:FindFirstChild("Shared")
-	local modules = shared and shared:FindFirstChild("Modules")
-	local assets = modules and modules:FindFirstChild("Assets")
-	local animModule = assets and assets:FindFirstChild("Animations")
+	local Animations = GetAnimationsTable()
 
-	if animModule and animModule:IsA("ModuleScript") then
-		local ok, res = pcall(require, animModule)
-		if ok and type(res) == "table" then
-			for _, id in pairs(res) do
-				if CheckId(id) then
-					table.insert(toPreload, id)
-				end
+	if Animations then
+		for _, id in pairs(Animations) do
+			if CheckId(id) then
+				table.insert(toPreload, id)
 			end
 		end
 	end
 
+	print(`Preloader: Starting to preload {#toPreload} assets...`)
+
 	local ok, err = pcall(function()
-		ContentProvider:PreloadAsync(toPreload)
+		ContentProvider:PreloadAsync(toPreload, function(assetId, status) end)
 	end)
+
 	if not ok then
-		warn("PreloadAsync failed:", err)
+		warn("Preloader: PreloadAsync failed:", err)
+	else
+		print("Preloader: Asset preloading complete")
 	end
 end
+
 local function LoadAll()
+	local startTime = tick()
+	print("=== Preloader: Starting ===")
+
+	-- Load animations first (they take longer)
 	Preloader.LoadAnimations()
+
+	-- Then preload other assets
 	Preloader.LoadExtra()
+
+	local totalTime = math.floor((tick() - startTime) * 100) / 100
+	print(`=== Preloader: Complete ({totalTime}s) ===`)
 end
 
 function Preloader.Start()

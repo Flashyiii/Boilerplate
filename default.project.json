@@ -13,6 +13,12 @@
               "$path": "src/services/CommandService/Client.luau"
             }
           },
+          "MovementService": {
+            "$className": "Folder",
+            "MovementServiceClient": {
+              "$path": "src/services/MovementService/Client.luau"
+            }
+          },
           "RagdollService": {
             "$className": "Folder",
             "RagdollServiceClient": {
@@ -70,6 +76,27 @@
               }
             }
           },
+          "Data": {
+            "$className": "Folder",
+            "MoveStats": {
+              "$className": "Folder",
+              "Global": {
+                "$className": "Folder",
+                "Summon": {
+                  "$path": "src/Modules/Data/MoveStats/Global/Summon.luau"
+                }
+              },
+              "StatHandler": {
+                "$path": "src/Modules/Data/MoveStats/StatHandler.luau"
+              },
+              "TheWorld": {
+                "$className": "Folder",
+                "Summon": {
+                  "$path": "src/Modules/Data/MoveStats/TheWorld/Summon.luau"
+                }
+              }
+            }
+          },
           "Game": {
             "$className": "Folder",
             "ClientUtil": {
@@ -81,10 +108,40 @@
             "Preloader": {
               "$path": "src/Modules/Game/Preloader.luau"
             }
+          },
+          "Helper": {
+            "$className": "Folder",
+            "CameraMover": {
+              "$path": "src/Modules/Helper/CameraMover.luau"
+            },
+            "DeepMerge": {
+              "$path": "src/Modules/Helper/DeepMerge.luau"
+            },
+            "MergeTable": {
+              "$path": "src/Modules/Helper/MergeTable.luau"
+            },
+            "VFXHelper": {
+              "$path": "src/Modules/Helper/VFXHelper.luau"
+            }
+          },
+          "Utility": {
+            "$className": "Folder",
+            "CameraShaker": {
+              "$path": "src/Modules/Utility/CameraShaker.luau"
+            },
+            "CustomShaker": {
+              "$path": "src/Modules/Utility/CustomShaker.luau"
+            }
           }
         },
         "Visuals": {
-          "$path": "src/visuals"
+          "$path": "src/visuals",
+          "Highlight": {
+            "$path": "src/visuals/Highlight.luau"
+          },
+          "SummonFX": {
+            "$path": "src/visuals/SummonFX.luau"
+          }
         },
         "WCS": {
           "$path": "src/wcs"
@@ -112,6 +169,9 @@
               },
               "Stun": {
                 "$path": "src/wcs/Conditions/States/Stun.luau"
+              },
+              "Summoned": {
+                "$path": "src/wcs/Conditions/States/Summoned.luau"
               }
             }
           },
@@ -125,6 +185,9 @@
             "$className": "Folder",
             "Dash": {
               "$path": "src/wcs/Skills/Dash.luau"
+            },
+            "Summon": {
+              "$path": "src/wcs/Skills/Summon.luau"
             }
           }
         }
@@ -142,10 +205,28 @@
       },
       "Services": {
         "$className": "Folder",
+        "CollisionService": {
+          "$className": "Folder",
+          "CollisionServiceServer": {
+            "$path": "src/services/CollisionService/Server.luau"
+          }
+        },
         "CommandService": {
           "$className": "Folder",
           "CommandServiceServer": {
             "$path": "src/services/CommandService/Server.luau"
+          }
+        },
+        "MovementService": {
+          "$className": "Folder",
+          "MovementServiceServer": {
+            "$path": "src/services/MovementService/Server.luau"
+          }
+        },
+        "RagdollService": {
+          "$className": "Folder",
+          "RagdollServiceServer": {
+            "$path": "src/services/RagdollService/Server.luau"
           }
         },
         "SpawnService": {

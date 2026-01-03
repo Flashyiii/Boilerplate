@@ -24,7 +24,7 @@ function Dash:OnStartServer()
 	local humanoid = character:FindFirstChildOfClass("Humanoid")
 	if humanoid then
 		ClientUtil.PlaySound("HeavyHit", character.PrimaryPart, { Volume = 4, TimePosition = 0 })
-		ClientUtil.PlayAnimation("TheWorld-TimeStopPlayer", character)
+		ClientUtil.PlayAnimation("TimeStopPlayer", character, character:GetAttribute("Moveset"))
 
 		local StunEffect = Stun.new(self.Character)
 		StunEffect:Start(EndLagDuration)

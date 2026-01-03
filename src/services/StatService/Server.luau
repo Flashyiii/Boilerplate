@@ -12,9 +12,7 @@ function StatServiceServer.initCharacter(self: StatServiceServer, character: Mod
 	end
 end
 
-function StatServiceServer.init(self: StatServiceServer)
-	print("StatServiceServer initialized")
-end
+function StatServiceServer.init(self: StatServiceServer) end
 
 export type StatServiceServer = typeof(StatServiceServer) & {}
 
