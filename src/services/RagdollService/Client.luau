@@ -1,26 +1,30 @@
 local Players = game:GetService("Players")
 
 local Player: Player = Players.LocalPlayer
-local Character: Model = Player.Character or Player.CharacterAdded:Wait()
 
-local Torso = Character:WaitForChild("Torso")
-local Humanoid = Character:FindFirstChildWhichIsA("Humanoid") or Character:WaitForChild("Humanoid")
-
-local function PushCharacter()
+local function PushCharacter(Torso)
 	Torso:ApplyImpulse(Torso.CFrame.LookVector * -100)
 end
 
-Character:GetAttributeChangedSignal("Ragdoll"):Connect(function()
-	local IsRagdoll = Character:GetAttribute("Ragdoll")
+local function AttributeChangedSignal(Char)
+	local Torso = Char:WaitForChild("Torso")
+	local Humanoid = Char:FindFirstChildWhichIsA("Humanoid") or Char:WaitForChild("Humanoid")
 
-	if IsRagdoll then
-		Humanoid:ChangeState(Enum.HumanoidStateType.Ragdoll)
-		Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp, false)
+	Char:GetAttributeChangedSignal("Ragdoll"):Connect(function()
+		local IsRagdoll = Char:GetAttribute("Ragdoll")
 
-		PushCharacter()
-	else
-		Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
-	end
-end)
+		if IsRagdoll then
+			Humanoid:ChangeState(Enum.HumanoidStateType.Ragdoll)
+			Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp, false)
+
+			PushCharacter(Torso)
+		else
+			Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+		end
+	end)
+end
+
+local Character = Players.LocalPlayer.Character or Players.LocalPlayer.Character:Wait()
+AttributeChangedSignal(Character)
 
 return {}

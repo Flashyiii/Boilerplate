@@ -3,7 +3,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local conch = require(ReplicatedStorage.Packages.conch)
 local wcs = require(ReplicatedStorage.Packages.wcs)
-local Dash = require(ReplicatedStorage.Shared.WCS.Skills.Dash)
+local Dash = require(ReplicatedStorage.Shared.Wcs.Skills.Global.Dash)
 
 local Testing = {}
 
@@ -18,7 +18,7 @@ conch.register("Knockback", {
 	end,
 
 	callback = function(target, attacker, speed, time)
-		local KnockbackHandler = require(ReplicatedStorage.Shared.Modules.Game.KnockbackHandler)
+		local KnockbackHandler = require(ReplicatedStorage.Shared.Modules.Utility.KnockbackHandler)
 
 		local targetCharacter = target.Character
 		local attackerCharacter = attacker.Character
@@ -44,7 +44,7 @@ conch.register("Ragdoll", {
 		local TargetCharacter = target.Character
 		if TargetCharacter then
 			local Target = wcs.Character.GetCharacterFromInstance(TargetCharacter)
-			local RagdollStatus = require(ReplicatedStorage.Shared.WCS.Conditions.States.Ragdoll)
+			local RagdollStatus = require(ReplicatedStorage.Shared.Wcs.Conditions.States.Ragdoll)
 			local Ragdoll = RagdollStatus.new(Target)
 			Ragdoll:Start(time)
 		end
@@ -62,7 +62,7 @@ conch.register("Run", {
 		local TargetCharacter = target.Character
 		if TargetCharacter then
 			local Target = wcs.Character.GetCharacterFromInstance(TargetCharacter)
-			local RunningStatus = require(ReplicatedStorage.Shared.WCS.Conditions.States.Running)
+			local RunningStatus = require(ReplicatedStorage.Shared.Wcs.Conditions.States.Running)
 			local Running = RunningStatus.new(Target)
 			Running:Start(time)
 		end
@@ -93,7 +93,7 @@ conch.register("Summon", {
 	end,
 
 	callback = function(target)
-		local Summon = require(ReplicatedStorage.Shared.WCS.Skills.Summon)
+		local Summon = require(ReplicatedStorage.Shared.Wcs.Skills.Global.Summon)
 
 		local TargetCharacter = target.Character
 		if TargetCharacter then

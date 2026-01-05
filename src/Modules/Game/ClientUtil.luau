@@ -1,13 +1,15 @@
 local RepStorage = game:GetService("ReplicatedStorage")
 local Debris = game:GetService("Debris")
+local KeyframeSequenceProvider = game:GetService("KeyframeSequenceProvider")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ContentProvider = game:GetService("ContentProvider")
 local RNG = Random.new()
 
 local _CurrentCamera = workspace.CurrentCamera
 
 local FloorWhitelist = RaycastParams.new()
 FloorWhitelist.FilterType = Enum.RaycastFilterType.Include
-FloorWhitelist.FilterDescendantsInstances = { workspace.Map }
+FloorWhitelist.FilterDescendantsInstances = {}
 
 local ClientUtil = {
 	AllAnimations = {},
@@ -93,6 +95,10 @@ function ClientUtil.PlaySound(SoundName: string, PlaceToPlay: Instance | CFrame,
 		template.SoundId = tostring(soundId)
 		template.Volume = 1
 		_soundCache[resolvedName] = template
+		-- Preload sound async to avoid delay on first play
+		task.spawn(function()
+			ContentProvider:PreloadAsync({ template })
+		end)
 	end
 
 	local sound = template:Clone()
@@ -422,6 +428,45 @@ function ClientUtil.GetAnimationTrack(animName: string, character: Model, movese
 	end
 
 	return nil
+end
+
+function getAnimId(name)
+	local id = AnimationData[name]
+	if not id then
+		warn(("Animation %q not found in AnimationData."):format(name))
+		return ""
+	end
+	return id
+end
+
+function ClientUtil.GetSequenceLength(name: string, moveset: string?, event: string?): number
+	local realName = GetAnimationName(name, moveset)
+	local animId = getAnimId(realName)
+	if animId == "" then
+		return 0
+	end
+
+	local sequence = KeyframeSequenceProvider:GetKeyframeSequenceAsync(animId)
+	local maxTime = 0
+
+	if event then
+		for _, keyframe in ipairs(sequence:GetKeyframes()) do
+			for _, marker in ipairs(keyframe:GetMarkers()) do
+				if marker.Name == event then
+					return keyframe.Time
+				end
+			end
+		end
+		return 0
+	end
+
+	for _, keyframe in ipairs(sequence:GetKeyframes()) do
+		if keyframe.Time > maxTime then
+			maxTime = keyframe.Time
+		end
+	end
+
+	return maxTime
 end
 
 function ClientUtil.IsAnimationPlaying(animName: string, character: Model, moveset: string?): boolean

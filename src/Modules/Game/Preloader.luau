@@ -3,6 +3,7 @@ local ContentProvider = game:GetService("ContentProvider")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ExtraFolder = ReplicatedStorage:WaitForChild("Assets").Load
 local ClientUtil = require(RepStorage.Shared.Modules.Game.ClientUtil)
+local SoundData = require(RepStorage.Shared.Modules.Assets.Sounds)
 
 local Preloader = {}
 
@@ -113,6 +114,38 @@ function Preloader.LoadAnimations()
 	)
 end
 
+function Preloader.LoadSounds()
+	local soundInstances = {}
+	local count = 0
+
+	for name, id in pairs(SoundData) do
+		if CheckId(id) then
+			local sound = Instance.new("Sound")
+			sound.Name = name
+			sound.SoundId = tostring(id)
+			table.insert(soundInstances, sound)
+			count += 1
+		end
+	end
+
+	print(`Preloader: Starting to preload {count} sounds...`)
+
+	local ok, err = pcall(function()
+		ContentProvider:PreloadAsync(soundInstances)
+	end)
+
+	if not ok then
+		warn("Preloader: Sound preload failed:", err)
+	else
+		print("Preloader: Sound preloading complete")
+	end
+
+	-- Cleanup temp instances
+	for _, sound in soundInstances do
+		sound:Destroy()
+	end
+end
+
 function Preloader.LoadExtra()
 	local toPreload = { RepStorage }
 
@@ -143,7 +176,10 @@ local function LoadAll()
 	local startTime = tick()
 	print("=== Preloader: Starting ===")
 
-	-- Load animations first (they take longer)
+	-- Load sounds first (quick and needed for instant feedback)
+	Preloader.LoadSounds()
+
+	-- Load animations (they take longer)
 	Preloader.LoadAnimations()
 
 	-- Then preload other assets

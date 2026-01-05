@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local RunService = game:GetService("RunService")
 
+local maid = require(ReplicatedStorage.Packages.maid)
 local ClientUtil = require(ReplicatedStorage.Shared.Modules.Game.ClientUtil)
 local MovementServiceClient = {}
 
@@ -18,7 +19,7 @@ local HeadC0 = HeadJoint.C0
 
 local Floor = RaycastParams.new()
 Floor.FilterType = Enum.RaycastFilterType.Include
-Floor.FilterDescendantsInstances = { workspace.Map }
+Floor.FilterDescendantsInstances = { workspace.World.Map }
 
 function MovementServiceClient._onRenderStep(self: MovementServiceClient, Delta: number): ()
 	local IsDowned = Character:GetAttribute("Downed")
@@ -128,6 +129,23 @@ function MovementServiceClient._lean(self: MovementServiceClient, Delta: number)
 end
 
 function MovementServiceClient.init(self: MovementServiceClient)
+	Character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
+
+	game.Players.LocalPlayer.CharacterAdded:Connect(function(char)
+		Character = char
+		Humanoid = Character:WaitForChild("Humanoid") :: Humanoid
+		HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+		Torso = Character:WaitForChild("Torso")
+
+		RootJoint = HumanoidRootPart:WaitForChild("RootJoint")
+		HeadJoint = Torso:WaitForChild("Neck")
+
+		RootC0 = RootJoint.C0
+		HeadC0 = HeadJoint.C0
+
+		Humanoid.StateChanged:Connect(StateChanged)
+	end)
+
 	Humanoid.StateChanged:Connect(StateChanged)
 
 	RunService.RenderStepped:Connect(function(Delta: number)

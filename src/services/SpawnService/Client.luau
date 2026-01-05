@@ -6,6 +6,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 function SpawnServiceClient._createCameraController(self: SpawnServiceClient)
 	local Character = Players.LocalPlayer.Character or Players.LocalPlayer.CharacterAdded:Wait()
+	Players.LocalPlayer.CharacterAdded:Connect(function(char)
+		self:_createCameraController()
+	end)
+
 	local CameraPositionObject = Instance.new("Part")
 	CameraPositionObject.Name = "CameraPosition"
 	CameraPositionObject.Size = Vector3.new(1, 1, 1)

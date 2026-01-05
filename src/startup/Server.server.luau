@@ -24,7 +24,7 @@ DataService:init({
 })
 
 local Server = wcs.CreateServer()
-Server:RegisterDirectory(ReplicatedStorage.Shared.WCS)
+Server:RegisterDirectory(ReplicatedStorage.Shared.Wcs)
 Server:Start()
 
 local Services = {}

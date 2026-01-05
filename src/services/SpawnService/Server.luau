@@ -5,10 +5,11 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local InputServiceServer = require(ServerScriptService.Services.InputService.InputServiceServer)
+local RagdollServiceServer = require(ServerScriptService.Services.RagdollService.RagdollServiceServer)
 local StatServiceServer = require(ServerScriptService.Services.StatService.StatServiceServer)
 local wcs = require(ReplicatedStorage.Packages.wcs)
-local Dash = require(ReplicatedStorage.Shared.WCS.Skills.Dash)
-local Summon = require(ReplicatedStorage.Shared.WCS.Skills.Summon)
+local CustomShaker = require(ReplicatedStorage.Shared.Modules.Utility.CustomShaker)
 local Character = wcs.Character
 
 function SetAttributes(char: Model): ()
@@ -16,20 +17,12 @@ function SetAttributes(char: Model): ()
 	char:SetAttribute("TimeStoped", false)
 	char:SetAttribute("Moveset", "TheWorld")
 	char:SetAttribute("CanJump", true)
-end
 
-function SetSkills(char: Model): ()
-	-- TODO : Testing system for Skill Development
-
-	local WCS_Character = Character.GetCharacterFromInstance(char)
-	if not WCS_Character then
-		return
-	end
-	warn("Setting Skills for ", char.Name)
-
-	--* Skills
-	Dash.new(WCS_Character)
-	Summon.new(WCS_Character)
+	char:SetAttribute("Stand", "TheWorld") -- TODO: Implement proper stand selection
+	task.delay(5, function()
+		char:SetAttribute("Stand", "TheWorld")
+		--char:SetAttribute("Moveset", "TheWorld")
+	end)
 end
 
 function Char(char: Model): ()
@@ -40,12 +33,10 @@ function Char(char: Model): ()
 		Player:SetAttribute("Loaded", true)
 	end
 
-	char.Parent = workspace.Live
+	char.Parent = workspace.World.Live
 
 	local WCS_Character = Character.new(CharacterModel)
 	StatServiceServer:initCharacter(CharacterModel)
-
-	SetSkills(char)
 	SetAttributes(char)
 
 	WCS_Character:SetDefaultProps({
@@ -72,10 +63,11 @@ function SpawnServiceServer.init(self: SpawnServiceServer)
 		Char(player.Character or player.CharacterAdded:Wait())
 	end
 
-	for _, char in pairs(workspace.Live:GetChildren()) do
+	for _, char in pairs(workspace.World.Live:GetChildren()) do
 		if char:GetAttribute("Loaded") == false then
 			continue
 		end
+		RagdollServiceServer.NPC(char)
 		Char(char)
 	end
 
@@ -86,6 +78,10 @@ function SpawnServiceServer.init(self: SpawnServiceServer)
 			end
 			Char(char)
 		end)
+	end)
+
+	Character.CharacterCreated:Connect(function(Character)
+		InputServiceServer:bindCharacter(Character)
 	end)
 end
 

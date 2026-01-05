@@ -9,7 +9,7 @@ Preloader.Start()
 
 local WCS = require(ReplicatedStorage.Packages.wcs)
 local Client = WCS.CreateClient()
-Client:RegisterDirectory(ReplicatedStorage.Shared.WCS)
+Client:RegisterDirectory(ReplicatedStorage.Shared.Wcs)
 
 Client:Start()
 

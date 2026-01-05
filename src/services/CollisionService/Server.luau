@@ -16,7 +16,6 @@ local function InitializeCollisionGroups()
 		PhysicsService:RegisterCollisionGroup(STAND_GROUP)
 	end
 
-	-- Characters and Stands should not collide with each other
 	PhysicsService:CollisionGroupSetCollidable(CHARACTER_GROUP, STAND_GROUP, false)
 	PhysicsService:CollisionGroupSetCollidable(STAND_GROUP, STAND_GROUP, false)
 	PhysicsService:CollisionGroupSetCollidable(CHARACTER_GROUP, CHARACTER_GROUP, false)
@@ -37,8 +36,6 @@ local function AddToStandGroup(part: BasePart)
 	end)
 	if not success then
 		warn("Failed to set part.CollisionGroup to '" .. STAND_GROUP .. "': " .. tostring(err))
-	else
-		print("Sucessfully added stand")
 	end
 end
 
@@ -96,7 +93,7 @@ end
 function CollisionService.init()
 	InitializeCollisionGroups()
 
-	for _, character in ipairs(workspace.Live:GetChildren()) do
+	for _, character in ipairs(workspace.World.Live:GetChildren()) do
 		if character:FindFirstChildOfClass("Humanoid") then
 			CollisionService.SetupCharacter(character)
 			ListenForCharacterParts(character)

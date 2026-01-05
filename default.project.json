@@ -1,5 +1,5 @@
 {
-  "name": "boilerplate",
+  "name": "RojoLand",
   "tree": {
     "$className": "DataModel",
     "ReplicatedStorage": {
@@ -11,6 +11,12 @@
             "$className": "Folder",
             "CommandServiceClient": {
               "$path": "src/services/CommandService/Client.luau"
+            }
+          },
+          "InputService": {
+            "$className": "Folder",
+            "InputServiceClient": {
+              "$path": "src/services/InputService/Client.luau"
             }
           },
           "MovementService": {
@@ -32,6 +38,12 @@
             "$className": "Folder",
             "SpawnServiceClient": {
               "$path": "src/services/SpawnService/Client.luau"
+            }
+          },
+          "ToolService": {
+            "$className": "Folder",
+            "ToolServiceClient": {
+              "$path": "src/services/ToolService/Client.luau"
             }
           }
         },
@@ -78,21 +90,36 @@
           },
           "Data": {
             "$className": "Folder",
-            "MoveStats": {
+            "Moves": {
               "$className": "Folder",
-              "Global": {
+              "MoveRegistry": {
+                "$path": "src/Modules/Data/Moves/MoveRegistry.luau"
+              },
+              "Movesets": {
                 "$className": "Folder",
-                "Summon": {
-                  "$path": "src/Modules/Data/MoveStats/Global/Summon.luau"
+                "None": {
+                  "$path": "src/Modules/Data/Moves/Movesets/None.luau"
+                },
+                "TheWorld": {
+                  "$path": "src/Modules/Data/Moves/Movesets/TheWorld.luau"
                 }
               },
-              "StatHandler": {
-                "$path": "src/Modules/Data/MoveStats/StatHandler.luau"
-              },
-              "TheWorld": {
+              "Sources": {
                 "$className": "Folder",
-                "Summon": {
-                  "$path": "src/Modules/Data/MoveStats/TheWorld/Summon.luau"
+                "Combat": {
+                  "$path": "src/Modules/Data/Moves/Sources/Combat.luau"
+                },
+                "Movement": {
+                  "$path": "src/Modules/Data/Moves/Sources/Movement.luau"
+                },
+                "Stands": {
+                  "$className": "Folder",
+                  "StandBase": {
+                    "$path": "src/Modules/Data/Moves/Sources/Stands/StandBase.luau"
+                  },
+                  "TheWorld": {
+                    "$path": "src/Modules/Data/Moves/Sources/Stands/TheWorld.luau"
+                  }
                 }
               }
             }
@@ -101,9 +128,6 @@
             "$className": "Folder",
             "ClientUtil": {
               "$path": "src/Modules/Game/ClientUtil.luau"
-            },
-            "KnockbackHandler": {
-              "$path": "src/Modules/Game/KnockbackHandler.luau"
             },
             "Preloader": {
               "$path": "src/Modules/Game/Preloader.luau"
@@ -131,20 +155,23 @@
             },
             "CustomShaker": {
               "$path": "src/Modules/Utility/CustomShaker.luau"
+            },
+            "Input": {
+              "$path": "src/Modules/Utility/Input.luau"
+            },
+            "KnockbackHandler": {
+              "$path": "src/Modules/Utility/KnockbackHandler.luau"
             }
           }
         },
         "Visuals": {
-          "$path": "src/visuals",
+          "$className": "Folder",
           "Highlight": {
             "$path": "src/visuals/Highlight.luau"
           },
           "SummonFX": {
             "$path": "src/visuals/SummonFX.luau"
           }
-        },
-        "WCS": {
-          "$path": "src/wcs"
         },
         "Wcs": {
           "$className": "Folder",
@@ -183,11 +210,35 @@
           },
           "Skills": {
             "$className": "Folder",
-            "Dash": {
-              "$path": "src/wcs/Skills/Dash.luau"
+            "Global": {
+              "$className": "Folder",
+              "Barrage": {
+                "$path": "src/wcs/Skills/Global/Barrage.luau"
+              },
+              "Dash": {
+                "$path": "src/wcs/Skills/Global/Dash.luau"
+              },
+              "M1": {
+                "$path": "src/wcs/Skills/Global/M1.luau"
+              },
+              "Summon": {
+                "$path": "src/wcs/Skills/Global/Summon.luau"
+              }
             },
-            "Summon": {
-              "$path": "src/wcs/Skills/Summon.luau"
+            "Shared": {
+              "$className": "Folder",
+              "TimeStop": {
+                "$path": "src/wcs/Skills/Shared/TimeStop.luau"
+              }
+            },
+            "TheWorld": {
+              "$className": "Folder",
+              "FaceCrusher": {
+                "$path": "src/wcs/Skills/TheWorld/FaceCrusher.luau"
+              },
+              "RoadRoller": {
+                "$path": "src/wcs/Skills/TheWorld/RoadRoller.luau"
+              }
             }
           }
         }
@@ -217,6 +268,12 @@
             "$path": "src/services/CommandService/Server.luau"
           }
         },
+        "InputService": {
+          "$className": "Folder",
+          "InputServiceServer": {
+            "$path": "src/services/InputService/Server.luau"
+          }
+        },
         "MovementService": {
           "$className": "Folder",
           "MovementServiceServer": {
@@ -239,6 +296,12 @@
           "$className": "Folder",
           "StatServiceServer": {
             "$path": "src/services/StatService/Server.luau"
+          }
+        },
+        "ToolService": {
+          "$className": "Folder",
+          "ToolServiceServer": {
+            "$path": "src/services/ToolService/Server.luau"
           }
         }
       },

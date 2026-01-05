@@ -48,7 +48,7 @@ function getVirtualPath(filepath) {
 }
 
 const tree = {
-  name: "boilerplate",
+  name: "RojoLand",
   tree: {
     $className: "DataModel",
 
@@ -57,10 +57,6 @@ const tree = {
         $className: "Folder",
         Services: { $className: "Folder", },
         Classes: {  $className: "Folder", },
-        Modules: { $className: "Folder", },
-        Visuals : { $path: "src/visuals",  },
-        WCS : { $path: "src/wcs",  },
-
       },
       Packages: { $path: "Packages", },
       UI: { $path: "src/ui", },

@@ -64,6 +64,8 @@ function KnockbackHandler.Knockback(Attacker: Model, Target: Model, KnockbackDat
 			BodyVelocity.Velocity = (AttackerRootPart.CFrame.LookVector * KnockbackSpeed) + KnockbackVelocity
 		elseif Relative == "Target" then
 			BodyVelocity.Velocity = (TargetRootPart.CFrame.LookVector * KnockbackSpeed) + KnockbackVelocity
+		elseif Relative.X then
+			BodyVelocity.Velocity = Relative * KnockbackSpeed + KnockbackVelocity
 		end
 	elseif RelativeNegative then
 		if RelativeNegative == "Attacker" then

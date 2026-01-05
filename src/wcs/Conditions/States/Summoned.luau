@@ -14,8 +14,8 @@ local wcs = require(ReplicatedStorage.Packages.wcs)
 
 local ClientUtil = require(ReplicatedStorage.Shared.Modules.Game.ClientUtil)
 local CameraMover = require(ReplicatedStorage.Shared.Modules.Helper.CameraMover)
-local Stun = require(ReplicatedStorage.Shared.WCS.Conditions.States.Stun)
-local EndLagStatus = require(ReplicatedStorage.Shared.WCS.Conditions.States.EndLag)
+local Stun = require(ReplicatedStorage.Shared.Wcs.Conditions.States.Stun)
+local EndLagStatus = require(ReplicatedStorage.Shared.Wcs.Conditions.States.EndLag)
 local Highlight = require(ReplicatedStorage.Shared.Visuals.Highlight)
 
 local Settings = {
@@ -69,8 +69,6 @@ local function AdjustSize(Model: Model, Size: number, dur: number?)
 	return connection
 end
 
-
-
 function Summoned:OnConstruct()
 	self.MutualExclusives = {
 		Stun,
@@ -107,7 +105,6 @@ function Summoned:_newStand()
 		self.StandObject:PivotTo(HumanoidRootPart.CFrame * CFrame.Angles(math.pi, 0, 0)) -- For some reason the stand is upside down by default
 		self.StandObject:ScaleTo(0.05)
 
-		-- Create weld constraint to follow character
 		local weld = Instance.new("WeldConstraint")
 		weld.Part0 = StandRootPart
 		weld.Part1 = HumanoidRootPart
