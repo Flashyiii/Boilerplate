@@ -1957,6 +1957,20 @@
                   ]
                 },
                 {
+                  "name": "farukcoskn_trove@1.0.1",
+                  "className": "Folder",
+                  "children": [
+                    {
+                      "name": "trove",
+                      "className": "ModuleScript",
+                      "filePaths": [
+                        "Packages\\_Index\\farukcoskn_trove@1.0.1\\trove\\src\\init.lua",
+                        "Packages\\_Index\\farukcoskn_trove@1.0.1\\trove\\default.project.json"
+                      ]
+                    }
+                  ]
+                },
+                {
                   "name": "flamenco687_maid@3.2.2",
                   "className": "Folder",
                   "children": [
@@ -3286,6 +3300,13 @@
               ]
             },
             {
+              "name": "trove",
+              "className": "ModuleScript",
+              "filePaths": [
+                "Packages\\trove.lua"
+              ]
+            },
+            {
               "name": "wcs",
               "className": "ModuleScript",
               "filePaths": [
@@ -3341,6 +3362,13 @@
                       ]
                     },
                     {
+                      "name": "Dummies",
+                      "className": "ModuleScript",
+                      "filePaths": [
+                        "src/Modules/Commands/Dummies.luau"
+                      ]
+                    },
+                    {
                       "name": "Testing",
                       "className": "ModuleScript",
                       "filePaths": [
@@ -3393,6 +3421,19 @@
                   "className": "Folder",
                   "children": [
                     {
+                      "name": "Inventory",
+                      "className": "Folder",
+                      "children": [
+                        {
+                          "name": "Items",
+                          "className": "ModuleScript",
+                          "filePaths": [
+                            "src/Modules/Data/Inventory/Items.luau"
+                          ]
+                        }
+                      ]
+                    },
+                    {
                       "name": "Moves",
                       "className": "Folder",
                       "children": [
@@ -3404,9 +3445,23 @@
                           ]
                         },
                         {
+                          "name": "MovesTypes",
+                          "className": "ModuleScript",
+                          "filePaths": [
+                            "src/Modules/Data/Moves/Types.luau"
+                          ]
+                        },
+                        {
                           "name": "Movesets",
                           "className": "Folder",
                           "children": [
+                            {
+                              "name": "Global",
+                              "className": "ModuleScript",
+                              "filePaths": [
+                                "src/Modules/Data/Moves/Movesets/Global.luau"
+                              ]
+                            },
                             {
                               "name": "None",
                               "className": "ModuleScript",
@@ -3428,6 +3483,20 @@
                           "className": "Folder",
                           "children": [
                             {
+                              "name": "Combat",
+                              "className": "ModuleScript",
+                              "filePaths": [
+                                "src/Modules/Data/Moves/Sources/Combat.luau"
+                              ]
+                            },
+                            {
+                              "name": "Global",
+                              "className": "ModuleScript",
+                              "filePaths": [
+                                "src/Modules/Data/Moves/Sources/Global.luau"
+                              ]
+                            },
+                            {
                               "name": "Movement",
                               "className": "ModuleScript",
                               "filePaths": [
@@ -3439,26 +3508,19 @@
                               "className": "Folder",
                               "children": [
                                 {
-                                  "name": "TheWorld",
-                                  "className": "ModuleScript",
-                                  "filePaths": [
-                                    "src/Modules/Data/Moves/Sources/Stands/TheWorld.luau"
-                                  ]
-                                },
-                                {
                                   "name": "StandBase",
                                   "className": "ModuleScript",
                                   "filePaths": [
                                     "src/Modules/Data/Moves/Sources/Stands/StandBase.luau"
                                   ]
+                                },
+                                {
+                                  "name": "TheWorld",
+                                  "className": "ModuleScript",
+                                  "filePaths": [
+                                    "src/Modules/Data/Moves/Sources/Stands/TheWorld.luau"
+                                  ]
                                 }
-                              ]
-                            },
-                            {
-                              "name": "Combat",
-                              "className": "ModuleScript",
-                              "filePaths": [
-                                "src/Modules/Data/Moves/Sources/Combat.luau"
                               ]
                             }
                           ]
@@ -3472,10 +3534,77 @@
                   "className": "Folder",
                   "children": [
                     {
+                      "name": "AnimationPlayer",
+                      "className": "ModuleScript",
+                      "filePaths": [
+                        "src/Modules/Game/AnimationPlayer\\init.luau"
+                      ],
+                      "children": [
+                        {
+                          "name": "AnimationHandle",
+                          "className": "ModuleScript",
+                          "filePaths": [
+                            "src/Modules/Game/AnimationPlayer\\AnimationHandle.luau"
+                          ]
+                        },
+                        {
+                          "name": "AnimationPlayer",
+                          "className": "ModuleScript",
+                          "filePaths": [
+                            "src/Modules/Game/AnimationPlayer\\AnimationPlayer.luau"
+                          ]
+                        },
+                        {
+                          "name": "ChainHandle",
+                          "className": "ModuleScript",
+                          "filePaths": [
+                            "src/Modules/Game/AnimationPlayer\\ChainHandle.luau"
+                          ]
+                        },
+                        {
+                          "name": "Types",
+                          "className": "ModuleScript",
+                          "filePaths": [
+                            "src/Modules/Game/AnimationPlayer\\Types.luau"
+                          ]
+                        }
+                      ]
+                    },
+                    {
                       "name": "ClientUtil",
                       "className": "ModuleScript",
                       "filePaths": [
                         "src/Modules/Game/ClientUtil.luau"
+                      ]
+                    },
+                    {
+                      "name": "CutscenePlayer",
+                      "className": "ModuleScript",
+                      "filePaths": [
+                        "src/Modules/Game/CutscenePlayer\\init.luau"
+                      ],
+                      "children": [
+                        {
+                          "name": "CutscenePlayer",
+                          "className": "ModuleScript",
+                          "filePaths": [
+                            "src/Modules/Game/CutscenePlayer\\CutscenePlayer.luau"
+                          ]
+                        },
+                        {
+                          "name": "Types",
+                          "className": "ModuleScript",
+                          "filePaths": [
+                            "src/Modules/Game/CutscenePlayer\\Types.luau"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "KeyframesResearcher",
+                      "className": "ModuleScript",
+                      "filePaths": [
+                        "src/Modules/Game/KeyframesResearcher.luau"
                       ]
                     },
                     {
@@ -3513,10 +3642,38 @@
                       ]
                     },
                     {
+                      "name": "SkillChainManager",
+                      "className": "ModuleScript",
+                      "filePaths": [
+                        "src/Modules/Helper/SkillChainManager.luau"
+                      ]
+                    },
+                    {
+                      "name": "TurnInvis",
+                      "className": "ModuleScript",
+                      "filePaths": [
+                        "src/Modules/Helper/TurnInvis.luau"
+                      ]
+                    },
+                    {
                       "name": "VFXHelper",
                       "className": "ModuleScript",
                       "filePaths": [
                         "src/Modules/Helper/VFXHelper.luau"
+                      ]
+                    },
+                    {
+                      "name": "mergeStyleData",
+                      "className": "ModuleScript",
+                      "filePaths": [
+                        "src/Modules/Helper/mergeStyleData.luau"
+                      ]
+                    },
+                    {
+                      "name": "shallowMerge",
+                      "className": "ModuleScript",
+                      "filePaths": [
+                        "src/Modules/Helper/shallowMerge.luau"
                       ]
                     }
                   ]
@@ -3540,10 +3697,10 @@
                       ]
                     },
                     {
-                      "name": "Input",
+                      "name": "InputManager",
                       "className": "ModuleScript",
                       "filePaths": [
-                        "src/Modules/Utility/Input.luau"
+                        "src/Modules/Utility/InputManager.luau"
                       ]
                     },
                     {
@@ -3551,6 +3708,13 @@
                       "className": "ModuleScript",
                       "filePaths": [
                         "src/Modules/Utility/KnockbackHandler.luau"
+                      ]
+                    },
+                    {
+                      "name": "VFX",
+                      "className": "ModuleScript",
+                      "filePaths": [
+                        "src/Modules/Utility/VFX.luau"
                       ]
                     }
                   ]
@@ -3570,6 +3734,19 @@
                       "className": "ModuleScript",
                       "filePaths": [
                         "src/services/CommandService/Client.luau"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "CutsceneService",
+                  "className": "Folder",
+                  "children": [
+                    {
+                      "name": "CutsceneServiceClient",
+                      "className": "ModuleScript",
+                      "filePaths": [
+                        "src/services/CutsceneService/Client.luau"
                       ]
                     }
                   ]
@@ -3612,10 +3789,10 @@
                       ]
                     },
                     {
-                      "name": "Util",
+                      "name": "RagdollUtil",
                       "className": "ModuleScript",
                       "filePaths": [
-                        "src/services/RagdollService/Util.luau"
+                        "src/services/RagdollService/RagdollUtil.luau"
                       ]
                     }
                   ]
@@ -3652,6 +3829,13 @@
               "name": "Visuals",
               "className": "Folder",
               "children": [
+                {
+                  "name": "DamageIndicator",
+                  "className": "ModuleScript",
+                  "filePaths": [
+                    "src/visuals/DamageIndicator.luau"
+                  ]
+                },
                 {
                   "name": "Highlight",
                   "className": "ModuleScript",
@@ -3695,6 +3879,13 @@
                           ]
                         },
                         {
+                          "name": "Hit",
+                          "className": "ModuleScript",
+                          "filePaths": [
+                            "src/wcs/Conditions/States/Hit.luau"
+                          ]
+                        },
+                        {
                           "name": "IFrame",
                           "className": "ModuleScript",
                           "filePaths": [
@@ -3728,6 +3919,20 @@
                           "filePaths": [
                             "src/wcs/Conditions/States/Summoned.luau"
                           ]
+                        },
+                        {
+                          "name": "Attacking",
+                          "className": "ModuleScript",
+                          "filePaths": [
+                            "src/wcs/Conditions/States/Attacking.luau"
+                          ]
+                        },
+                        {
+                          "name": "Carrying",
+                          "className": "ModuleScript",
+                          "filePaths": [
+                            "src/wcs/Conditions/States/Carrying.luau"
+                          ]
                         }
                       ]
                     }
@@ -3755,20 +3960,6 @@
                       "className": "Folder",
                       "children": [
                         {
-                          "name": "Dash",
-                          "className": "ModuleScript",
-                          "filePaths": [
-                            "src/wcs/Skills/Global/Dash.luau"
-                          ]
-                        },
-                        {
-                          "name": "Summon",
-                          "className": "ModuleScript",
-                          "filePaths": [
-                            "src/wcs/Skills/Global/Summon.luau"
-                          ]
-                        },
-                        {
                           "name": "Barrage",
                           "className": "ModuleScript",
                           "filePaths": [
@@ -3776,10 +3967,31 @@
                           ]
                         },
                         {
+                          "name": "Dash",
+                          "className": "ModuleScript",
+                          "filePaths": [
+                            "src/wcs/Skills/Global/Dash.luau"
+                          ]
+                        },
+                        {
                           "name": "M1",
                           "className": "ModuleScript",
                           "filePaths": [
                             "src/wcs/Skills/Global/M1.luau"
+                          ]
+                        },
+                        {
+                          "name": "Run",
+                          "className": "ModuleScript",
+                          "filePaths": [
+                            "src/wcs/Skills/Global/Run.luau"
+                          ]
+                        },
+                        {
+                          "name": "Summon",
+                          "className": "ModuleScript",
+                          "filePaths": [
+                            "src/wcs/Skills/Global/Summon.luau"
                           ]
                         }
                       ]
@@ -3802,17 +4014,17 @@
                       "className": "Folder",
                       "children": [
                         {
-                          "name": "RoadRoller",
-                          "className": "ModuleScript",
-                          "filePaths": [
-                            "src/wcs/Skills/TheWorld/RoadRoller.luau"
-                          ]
-                        },
-                        {
                           "name": "FaceCrusher",
                           "className": "ModuleScript",
                           "filePaths": [
                             "src/wcs/Skills/TheWorld/FaceCrusher.luau"
+                          ]
+                        },
+                        {
+                          "name": "RoadRoller",
+                          "className": "ModuleScript",
+                          "filePaths": [
+                            "src/wcs/Skills/TheWorld/RoadRoller.luau"
                           ]
                         }
                       ]
@@ -3862,6 +4074,19 @@
                   "className": "ModuleScript",
                   "filePaths": [
                     "src/services/CommandService/Server.luau"
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "DamageService",
+              "className": "Folder",
+              "children": [
+                {
+                  "name": "DamageServiceServer",
+                  "className": "ModuleScript",
+                  "filePaths": [
+                    "src/services/DamageService/Server.luau"
                   ]
                 }
               ]

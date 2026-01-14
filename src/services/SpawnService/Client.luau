@@ -3,6 +3,7 @@ local SpawnServiceClient = {}
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 function SpawnServiceClient._createCameraController(self: SpawnServiceClient)
 	local Character = Players.LocalPlayer.Character or Players.LocalPlayer.CharacterAdded:Wait()
@@ -41,9 +42,12 @@ function SpawnServiceClient._rotateCamera(self: SpawnServiceClient)
 	local Character = Players.LocalPlayer.Character or Players.LocalPlayer.CharacterAdded:Wait()
 	local Humanoid = Character:FindFirstChildOfClass("Humanoid")
 
+	if Character:GetAttribute("InCutscene") then
+		return
+	end
+
 	if Character:GetAttribute("Ragdoll") then
 		Humanoid.AutoRotate = false
-
 		return
 	end
 

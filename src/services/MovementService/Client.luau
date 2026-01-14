@@ -1,10 +1,8 @@
-local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local RunService = game:GetService("RunService")
 
-local maid = require(ReplicatedStorage.Packages.maid)
-local ClientUtil = require(ReplicatedStorage.Shared.Modules.Game.ClientUtil)
+local AnimationPlayer = require(ReplicatedStorage.Shared.Modules.Game.AnimationPlayer)
 local MovementServiceClient = {}
 
 local Character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
@@ -21,67 +19,61 @@ local Floor = RaycastParams.new()
 Floor.FilterType = Enum.RaycastFilterType.Include
 Floor.FilterDescendantsInstances = { workspace.World.Map }
 
-function MovementServiceClient._onRenderStep(self: MovementServiceClient, Delta: number): ()
+function MovementServiceClient._onRenderStep(
+	self: MovementServiceClient,
+	Delta: number,
+	_Animator: any,
+	MovementHandles: any
+): ()
 	local IsDowned = Character:GetAttribute("Downed")
 	local IsMoving = Humanoid.MoveDirection.Magnitude > 0 and not IsDowned
-	local IsSummoned = CollectionService:HasTag(Character, "Summoned")
-	local WalkSpeed = Character:GetAttribute("WalkSpeed")
-	local Moveset = Character:GetAttribute("Moveset")
 
 	if IsDowned then
 		return
 	end
 
-	if IsMoving then
-		if Humanoid.WalkSpeed > WalkSpeed then
-			ClientUtil.PlayAnimation("Run", Character, Moveset)
-			ClientUtil.StopAnimation("Walk", Character)
-			ClientUtil.StopAnimation("Idle", Character)
-			--[[if IsSummoned then
-					if not ClientUtil.ReturnAnimInfo("StandRun").IsPlaying then
-						ClientUtil.PlayAnim("StandRun")
-						ClientUtil.StopAnim("StandWalk")
-					end
-				end--]]
+	if IsMoving and Humanoid.WalkSpeed ~= 0 then
+		if Humanoid.WalkSpeed > Character:GetAttribute("WalkSpeed") then
+			if not MovementHandles.Run:IsPlaying() then
+				MovementHandles.Idle:Stop()
+				MovementHandles.Walk:Stop()
+				MovementHandles.Run:Play()
+			end
 		else
-			ClientUtil.PlayAnimation("Walk", Character, Moveset)
-			ClientUtil.StopAnimation("Run", Character)
-			ClientUtil.StopAnimation("Idle", Character)
-
-			--[[if IsSummoned then
-					if not ClientUtil.ReturnAnimInfo("StandWalk").IsPlaying then
-						ClientUtil.PlayAnim("StandWalk")
-						ClientUtil.StopAnimation("StandRun")
-					end
-				end--]]
+			if not MovementHandles.Walk:IsPlaying() then
+				MovementHandles.Idle:Stop()
+				MovementHandles.Run:Stop()
+				MovementHandles.Walk:Play()
+			end
 		end
 	else
-		ClientUtil.PlayAnimation("Idle", Character, Moveset)
-		ClientUtil.StopAnimation("Walk", Character)
-		ClientUtil.StopAnimation("Run", Character)
+		if not MovementHandles.Idle:IsPlaying() then
+			MovementHandles.Walk:Stop()
+			MovementHandles.Run:Stop()
+			MovementHandles.Idle:Play()
+		end
 	end
 
 	if Humanoid:GetState() == Enum.HumanoidStateType.Running then
-		ClientUtil.StopAnimation("Fall", Character)
+		MovementHandles.Fall:Stop()
 	elseif Humanoid:GetState() == Enum.HumanoidStateType.Freefall then
-		if not ClientUtil.IsAnimationPlaying("Jump", Character, Moveset) then
-			ClientUtil.PlayAnimation("Fall", Character, Moveset)
+		if not MovementHandles.Jump:IsPlaying() and not MovementHandles.Fall:IsPlaying() then
+			MovementHandles.Fall:Play()
 		end
 	end
 
 	self:_lean(Delta)
 end
 
-local function StateChanged(_, HumanoidState)
-	local Moveset = Character:GetAttribute("Moveset")
+local function StateChanged(HumanoidState: Enum.HumanoidStateType, MovementHandles: any)
 	local CanJump = Character:GetAttribute("CanJump")
 
 	local AllStates = Enum.HumanoidStateType
 	Humanoid:SetStateEnabled(AllStates.Ragdoll, false)
 	Humanoid:SetStateEnabled(AllStates.FallingDown, false)
 
-	if HumanoidState == AllStates.Jumping and CanJump then
-		ClientUtil.PlayAnimation("Jump", Character, Moveset)
+	if HumanoidState == AllStates.Jumping and CanJump and Humanoid.JumpHeight ~= 0 then
+		MovementHandles.Jump:Play()
 		CanJump = false
 		Humanoid:SetStateEnabled(AllStates.Jumping, false)
 		task.delay(1.5, function()
@@ -89,9 +81,9 @@ local function StateChanged(_, HumanoidState)
 			Humanoid:SetStateEnabled(AllStates.Jumping, true)
 		end)
 	elseif HumanoidState == AllStates.Landed then
-		ClientUtil.PlayAnimation("Land", Character, Moveset)
-		ClientUtil.StopAnimation("Jump", Character)
-		ClientUtil.StopAnimation("Fall", Character)
+		MovementHandles.Land:Play()
+		MovementHandles.Jump:Stop()
+		MovementHandles.Fall:Stop()
 	end
 end
 
@@ -128,8 +120,23 @@ function MovementServiceClient._lean(self: MovementServiceClient, Delta: number)
 	)
 end
 
+local function CreateMovementHandles(Animator: any, Moveset: string?)
+	local handles = {
+		Idle = Animator:Play("Idle", Moveset):SetLooped(true):SetPriority(Enum.AnimationPriority.Idle),
+		Walk = Animator:Play("Walk", Moveset):SetLooped(true):SetPriority(Enum.AnimationPriority.Idle),
+		Run = Animator:Play("Run", Moveset):SetLooped(true):SetPriority(Enum.AnimationPriority.Idle),
+		Jump = Animator:Play("Jump", Moveset):SetPriority(Enum.AnimationPriority.Idle),
+		Fall = Animator:Play("Fall", Moveset):SetLooped(true):SetPriority(Enum.AnimationPriority.Idle),
+		Land = Animator:Play("Land", Moveset):SetPriority(Enum.AnimationPriority.Idle),
+	}
+	return handles
+end
+
 function MovementServiceClient.init(self: MovementServiceClient)
 	Character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
+	local Animator = AnimationPlayer.new(Character)
+	local MovementHandles = CreateMovementHandles(Animator, Character:GetAttribute("Moveset"))
+	MovementHandles.Idle:Play()
 
 	game.Players.LocalPlayer.CharacterAdded:Connect(function(char)
 		Character = char
@@ -143,13 +150,30 @@ function MovementServiceClient.init(self: MovementServiceClient)
 		RootC0 = RootJoint.C0
 		HeadC0 = HeadJoint.C0
 
-		Humanoid.StateChanged:Connect(StateChanged)
+		Animator = AnimationPlayer.new(Character)
+		MovementHandles = CreateMovementHandles(Animator, Character:GetAttribute("Moveset"))
+		MovementHandles.Idle:Play()
+
+		Humanoid.StateChanged:Connect(function(_, state)
+			StateChanged(state, MovementHandles)
+		end)
 	end)
 
-	Humanoid.StateChanged:Connect(StateChanged)
+	Character:GetAttributeChangedSignal("Moveset"):Connect(function()
+		for _, handle in MovementHandles do
+			handle:Destroy()
+		end
+		Animator = AnimationPlayer.new(Character)
+		MovementHandles = CreateMovementHandles(Animator, Character:GetAttribute("Moveset"))
+		MovementHandles.Idle:Play()
+	end)
+
+	Humanoid.StateChanged:Connect(function(_, state)
+		StateChanged(state, MovementHandles)
+	end)
 
 	RunService.RenderStepped:Connect(function(Delta: number)
-		self:_onRenderStep(Delta)
+		self:_onRenderStep(Delta, Animator, MovementHandles)
 	end)
 end
 

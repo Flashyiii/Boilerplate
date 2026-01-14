@@ -1,10 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local trove = require(ReplicatedStorage.Packages.trove)
 local wcs = require(ReplicatedStorage.Packages.wcs)
 local ClientUtil = require(ReplicatedStorage.Shared.Modules.Game.ClientUtil)
 local KnockbackHandler = require(ReplicatedStorage.Shared.Modules.Utility.KnockbackHandler)
 local Stun = require(ReplicatedStorage.Shared.Wcs.Conditions.States.Stun)
 local EndLagStatus = require(ReplicatedStorage.Shared.Wcs.Conditions.States.EndLag)
+local AnimationPlayer = require(ReplicatedStorage.Shared.Modules.Game.AnimationPlayer)
+local SkillBase = require(ReplicatedStorage.Shared.Wcs.Core.SkillBase)
 
 local function GetDashDirection(character)
 	local hrp = character:FindFirstChild("HumanoidRootPart")
@@ -45,10 +48,11 @@ end
 local Dash = wcs.RegisterSkill("Dash")
 
 function Dash:OnConstruct()
-	self.MutualExclusives = {
-		Stun,
-		EndLagStatus,
-	}
+	SkillBase.OnConstruct(self)
+end
+
+function Dash:CanCancel(): boolean
+	return false
 end
 
 function Dash:OnStartServer()
@@ -63,7 +67,9 @@ function Dash:OnStartServer()
 
 	if humanoid and hrp then
 		ClientUtil.PlaySound("Whoosh", hrp, { Volume = 1, TimePosition = 0 })
-		ClientUtil.PlayAnimation("TimeStopPlayer", character, character:GetAttribute("Moveset"))
+
+		local Animator = AnimationPlayer.new(character)
+		Animator:Play("Dash", character:GetAttribute("Moveset")):SetPriority(Enum.AnimationPriority.Movement):Play()
 
 		local StunEffect = Stun.new(self.Character)
 		StunEffect:Start(EndLagDuration)
@@ -72,6 +78,7 @@ function Dash:OnStartServer()
 		EndLagEffect:Start(EndLagDuration)
 
 		local dashDirection = GetDashDirection(character)
+
 		KnockbackHandler.Knockback(character, character, {
 			Speed = SpeedStat,
 			Time = Duration,

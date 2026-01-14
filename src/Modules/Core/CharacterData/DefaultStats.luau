@@ -21,7 +21,7 @@ local DefaultStats = {
 
 	--* Combat
 	DashDuration = 0.25,
-	DashCooldown = 2,
+	DashCooldown = 0.5,
 	DashSpeed = 60,
 }
 return DefaultStats

@@ -3,6 +3,7 @@ local ContentProvider = game:GetService("ContentProvider")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ExtraFolder = ReplicatedStorage:WaitForChild("Assets").Load
 local ClientUtil = require(RepStorage.Shared.Modules.Game.ClientUtil)
+local AnimationPlayer = require(RepStorage.Shared.Modules.Game.AnimationPlayer)
 local SoundData = require(RepStorage.Shared.Modules.Assets.Sounds)
 
 local Preloader = {}
@@ -55,20 +56,17 @@ function Preloader.LoadAnimations()
 	print(`Preloader: Starting to load {TotalAnimations} animations...`)
 
 	for i, Animation in AnimationTable do
-		-- Switch to second rig after 255 animations to avoid limit
 		if LoadedAnimations >= 255 and not UseSecondRig then
 			UseSecondRig = true
 			Rig:Destroy()
 			Rig = ExtraFolder.R6:Clone()
 			Rig.Parent = workspace.Effects
-			print("Preloader: Switching to second rig (255+ animations)")
 		end
 
 		local TimeElapsed = 0
 		local Track = nil
 		local Success = false
 
-		-- Try to load the animation
 		task.spawn(function()
 			local ok, result = pcall(function()
 				return ClientUtil.LoadAnimation(Animation, Rig)
@@ -81,18 +79,12 @@ function Preloader.LoadAnimations()
 			end
 		end)
 
-		-- Wait for load or timeout
 		repeat
 			TimeElapsed += task.wait()
 		until Track or TimeElapsed >= 10
 
 		if Success and Track then
 			LoadedAnimations += 1
-
-			-- Progress updates every 50 animations
-			if LoadedAnimations % 50 == 0 then
-				print(`Preloader: Loaded {LoadedAnimations}/{TotalAnimations} animations...`)
-			end
 		else
 			FailedAnimations += 1
 			if TimeElapsed >= 10 then
@@ -128,16 +120,12 @@ function Preloader.LoadSounds()
 		end
 	end
 
-	print(`Preloader: Starting to preload {count} sounds...`)
-
 	local ok, err = pcall(function()
 		ContentProvider:PreloadAsync(soundInstances)
 	end)
 
 	if not ok then
 		warn("Preloader: Sound preload failed:", err)
-	else
-		print("Preloader: Sound preloading complete")
 	end
 
 	-- Cleanup temp instances
@@ -162,27 +150,18 @@ function Preloader.LoadExtra()
 	print(`Preloader: Starting to preload {#toPreload} assets...`)
 
 	local ok, err = pcall(function()
-		ContentProvider:PreloadAsync(toPreload, function(assetId, status) end)
+		ContentProvider:PreloadAsync(toPreload, function(_assetId, _status) end)
 	end)
 
 	if not ok then
 		warn("Preloader: PreloadAsync failed:", err)
-	else
-		print("Preloader: Asset preloading complete")
 	end
 end
 
 local function LoadAll()
 	local startTime = tick()
-	print("=== Preloader: Starting ===")
-
-	-- Load sounds first (quick and needed for instant feedback)
 	Preloader.LoadSounds()
-
-	-- Load animations (they take longer)
 	Preloader.LoadAnimations()
-
-	-- Then preload other assets
 	Preloader.LoadExtra()
 
 	local totalTime = math.floor((tick() - startTime) * 100) / 100

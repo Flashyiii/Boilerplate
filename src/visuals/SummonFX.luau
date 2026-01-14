@@ -36,16 +36,20 @@ function StandFX:OnStart(Target)
 			end
 		end
 
-		FX = Attachment:Clone()
-		FX.Parent = Stand["Torso"]
-		for _, Particle in FX:GetDescendants() do
+		self.FX = Attachment:Clone()
+		self.FX.Parent = Stand["Torso"]
+		self._maid:GiveTask(self.FX)
+		
+		for _, Particle in self.FX:GetDescendants() do
 			if Particle:IsA("ParticleEmitter") then
 				local count = Particle:GetAttribute("EmitCount") or 0
 				local delayTime = Particle:GetAttribute("EmitDelay")
 
 				if delayTime then
 					task.delay(delayTime, function()
-						Particle:Emit(count)
+						if Particle and Particle.Parent then
+							Particle:Emit(count)
+						end
 					end)
 				else
 					Particle:Emit(count)
@@ -53,10 +57,12 @@ function StandFX:OnStart(Target)
 			end
 		end
 
+		self._destroyed = false
 		task.delay(3, function()
-			if FX and FX.Parent then
-				FX:Destroy()
-				FX = nil
+			if not self._destroyed and self.FX and self.FX.Parent then
+				self.FX:Destroy()
+			end
+			if not self._destroyed then
 				self:Destroy()
 			end
 		end)
@@ -64,15 +70,23 @@ function StandFX:OnStart(Target)
 		for _, Inst in Character:GetDescendants() do
 			if Inst:IsA("ParticleEmitter") or Inst:IsA("Beam") or Inst:IsA("Light") then
 				Inst.Enabled = false
-				task.delay(3, function()
-					self:Destroy()
-				end)
 			end
 		end
+		self._destroyed = false
+		task.delay(3, function()
+			if not self._destroyed then
+				self:Destroy()
+			end
+		end)
 	end
 end
 
 -- Lifecycle: OnDestroy
-function StandFX:OnDestroy() end
+function StandFX:OnDestroy()
+	self._destroyed = true
+	if self._maid then
+		self._maid:Cleanup()
+	end
+end
 
 return StandFX

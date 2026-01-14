@@ -1,30 +1,53 @@
 local Players = game:GetService("Players")
 
-local Player: Player = Players.LocalPlayer
+local Player = Players.LocalPlayer
 
-local function PushCharacter(Torso)
-	Torso:ApplyImpulse(Torso.CFrame.LookVector * -100)
+local RagdollServiceClient = {}
+
+local function OnRagdollChanged(character: Model)
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	if not humanoid then
+		return
+	end
+
+	local isRagdoll = character:GetAttribute("Ragdoll")
+
+	if isRagdoll then
+		humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp, false)
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.Running, false)
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
+	else
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp, true)
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.Running, true)
+		humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
+		humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+	end
 end
 
-local function AttributeChangedSignal(Char)
-	local Torso = Char:WaitForChild("Torso")
-	local Humanoid = Char:FindFirstChildWhichIsA("Humanoid") or Char:WaitForChild("Humanoid")
+local function SetupCharacter(character: Model)
+	if not character then
+		return
+	end
 
-	Char:GetAttributeChangedSignal("Ragdoll"):Connect(function()
-		local IsRagdoll = Char:GetAttribute("Ragdoll")
-
-		if IsRagdoll then
-			Humanoid:ChangeState(Enum.HumanoidStateType.Ragdoll)
-			Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp, false)
-
-			PushCharacter(Torso)
-		else
-			Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
-		end
+	character:GetAttributeChangedSignal("Ragdoll"):Connect(function()
+		OnRagdollChanged(character)
 	end)
+
+	if character:GetAttribute("Ragdoll") then
+		OnRagdollChanged(character)
+	end
 end
 
-local Character = Players.LocalPlayer.Character or Players.LocalPlayer.Character:Wait()
-AttributeChangedSignal(Character)
+function RagdollServiceClient.init()
+	local character = Player.Character
+	if character then
+		SetupCharacter(character)
+	end
 
-return {}
+	Player.CharacterAdded:Connect(SetupCharacter)
+end
+
+export type RagdollServiceClient = typeof(RagdollServiceClient)
+
+return RagdollServiceClient

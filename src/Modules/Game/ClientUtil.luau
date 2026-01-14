@@ -15,6 +15,9 @@ local ClientUtil = {
 	AllAnimations = {},
 }
 
+local AnimationPlayer = require(script.Parent.AnimationPlayer)
+ClientUtil.AnimationPlayer = AnimationPlayer
+
 export type TweenEasingTypes =
 	"Sine"
 	| "Circular"
@@ -28,29 +31,11 @@ export type TweenEasingTypes =
 	| "Exponential"
 export type TweenDirectionTypes = "In" | "Out" | "InOut"
 
-local clientLoops = {}
+local _clientLoops = {}
 
+local KeyframesResearcher = require(script.Parent.KeyframesResearcher)
 local SoundData = require(RepStorage.Shared.Modules.Assets.Sounds)
 local Animations = require(ReplicatedStorage.Shared.Modules.Assets.Animations)
-local AnimationData = nil
-do
-	local shared = RepStorage:FindFirstChild("Shared")
-	if shared then
-		local modules = shared:FindFirstChild("Modules")
-		if modules then
-			local assets = modules:FindFirstChild("Assets")
-			if assets then
-				local animModule = assets:FindFirstChild("Animations")
-				if animModule and animModule:IsA("ModuleScript") then
-					local ok, res = pcall(require, animModule)
-					if ok and type(res) == "table" then
-						AnimationData = res
-					end
-				end
-			end
-		end
-	end
-end
 
 local _soundCache = {} -- name -> template Sound
 local _activeSounds = {} -- list of playing sounds
@@ -75,7 +60,7 @@ local function _getSoundId(name: string, weaponName: string?)
 end
 
 function ClientUtil.PlaySound(SoundName: string, PlaceToPlay: Instance | CFrame, Options: any?)
-	local startTime = tick()
+	local _startTime = tick()
 	Options = Options or {}
 	local volume = Options.Volume or 1
 	local looped = Options.Looped or false
@@ -430,10 +415,10 @@ function ClientUtil.GetAnimationTrack(animName: string, character: Model, movese
 	return nil
 end
 
-function getAnimId(name)
-	local id = AnimationData[name]
+local function getAnimId(name)
+	local id = Animations[name]
 	if not id then
-		warn(("Animation %q not found in AnimationData."):format(name))
+		warn(("Animation %q not found in Animations."):format(name))
 		return ""
 	end
 	return id
@@ -467,6 +452,57 @@ function ClientUtil.GetSequenceLength(name: string, moveset: string?, event: str
 	end
 
 	return maxTime
+end
+
+local CharacterListStatus = {}
+
+function ClientUtil.GetStatusCharacter(Character: Model)
+	if not CharacterListStatus[Character] then
+		CharacterListStatus[Character] = {
+			ResearchFrames = {},
+		}
+	end
+	return CharacterListStatus[Character]
+end
+
+function ClientUtil.CreateKeyframes(Character: Model, Data)
+	local CombatFramesResearch = KeyframesResearcher.new()
+
+	CombatFramesResearch:SetSpeed(Data.Speed and Data.Speed or 1)
+	CombatFramesResearch:SetValidate(Data.Validate or function()
+		return Character and Character:IsDescendantOf(game)
+	end)
+
+	for _, v in pairs(Data.Frames) do
+		if typeof(v[2]) == "number" then
+			CombatFramesResearch:AddFrames(v[1], v[2], v[3])
+		else
+			CombatFramesResearch:AddFrame(v[1], v[2])
+		end
+	end
+
+	local TimeStoped = Character:GetAttributeChangedSignal("TimeStopped"):Connect(function()
+		if Character:GetAttribute("TimeStopped") == true then
+			CombatFramesResearch:SetSpeed(0)
+		end
+	end)
+
+	local EndTimeStoped = Character:GetAttributeChangedSignal("TimeStopped"):Connect(function()
+		if Character:GetAttribute("TimeStopped") == true then
+			CombatFramesResearch:SetSpeed(Data.Speed)
+		end
+	end)
+
+	local CharacterStatus = ClientUtil.GetStatusCharacter(Character)
+
+	CombatFramesResearch.Destroying:Connect(function()
+		TimeStoped:Disconnect()
+		EndTimeStoped:Disconnect()
+	end)
+
+	table.insert(CharacterStatus.ResearchFrames, CombatFramesResearch)
+
+	return CombatFramesResearch
 end
 
 function ClientUtil.IsAnimationPlaying(animName: string, character: Model, moveset: string?): boolean

@@ -1,49 +1,37 @@
+local PhysicsService = game:GetService("PhysicsService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local RagdollUtil = require(ReplicatedStorage.Shared.Services.RagdollService.RagdollUtil)
+
+local RAGDOLL_COLLISION_GROUP = "RagdollLimbs"
+
 local RagdollServiceServer = {}
 
-local PhysicsService = game:GetService("PhysicsService")
-local Players = game:GetService("Players")
-
-local PlayersCollisionGroup = "Char"
-local UncollidableGroup = "Uncollidable"
-
 local function InitializeRagdollCollisionGroups()
-	if not PhysicsService:IsCollisionGroupRegistered(PlayersCollisionGroup) then
-		PhysicsService:RegisterCollisionGroup(PlayersCollisionGroup)
+	if not PhysicsService:IsCollisionGroupRegistered(RAGDOLL_COLLISION_GROUP) then
+		PhysicsService:RegisterCollisionGroup(RAGDOLL_COLLISION_GROUP)
 	end
-
-	if not PhysicsService:IsCollisionGroupRegistered(UncollidableGroup) then
-		PhysicsService:RegisterCollisionGroup(UncollidableGroup)
-	end
-
-	PhysicsService:CollisionGroupSetCollidable(UncollidableGroup, PlayersCollisionGroup, false)
-	PhysicsService:CollisionGroupSetCollidable(UncollidableGroup, UncollidableGroup, false)
+	PhysicsService:CollisionGroupSetCollidable(RAGDOLL_COLLISION_GROUP, RAGDOLL_COLLISION_GROUP, false)
 end
 
 function RagdollServiceServer.init()
 	InitializeRagdollCollisionGroups()
 end
 
-function RagdollServiceServer.NPC(Char)
-	local function PushCharacter(Torso)
-		Torso:ApplyImpulse(Torso.CFrame.LookVector * -100)
-	end
+function RagdollServiceServer.Ragdoll(character: Model)
+	RagdollUtil:Ragdoll(character)
+end
 
-	print("Setting up npc")
-	local Torso = Char:WaitForChild("Torso")
-	local Humanoid = Char:FindFirstChildWhichIsA("Humanoid") or Char:WaitForChild("Humanoid")
+function RagdollServiceServer.UnRagdoll(character: Model)
+	RagdollUtil:UnRagdoll(character)
+end
 
-	Char:GetAttributeChangedSignal("Ragdoll"):Connect(function()
-		local IsRagdoll = Char:GetAttribute("Ragdoll")
+function RagdollServiceServer.Toggle(character: Model)
+	RagdollUtil:Toggle(character)
+end
 
-		if IsRagdoll then
-			Humanoid:ChangeState(Enum.HumanoidStateType.Ragdoll)
-			Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp, false)
-
-			PushCharacter(Torso)
-		else
-			Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
-		end
-	end)
+function RagdollServiceServer.IsRagdolled(character: Model): boolean
+	return RagdollUtil:IsRagdolled(character)
 end
 
 export type RagdollServiceServer = typeof(RagdollServiceServer)

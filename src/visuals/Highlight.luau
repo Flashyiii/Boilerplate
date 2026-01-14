@@ -7,6 +7,7 @@ local TweenService = game:GetService("TweenService")
 
 local maid = require(ReplicatedStorage.Packages.maid)
 local refx = require(ReplicatedStorage.Packages.refx)
+local trove = require(ReplicatedStorage.Packages.trove)
 
 local Highlight = refx.CreateEffect("Highlight")
 
@@ -29,8 +30,8 @@ end
 -- Lifecycle: OnConstruct
 function Highlight:OnConstruct()
 	self.DestroyOnEnd = false
-	self.DestroyOnLifecycleEnd = false
-	self.DisableLeakWarning = false
+	self.DestroyOnLifecycleEnd = true
+	self.MaxLifetime = 5
 end
 
 type HighlightParams = {
@@ -55,7 +56,6 @@ function Highlight:OnStart(Target, Params: HighlightParams)
 	local FadeInTime = Params.FadeInTime or 0.25
 	local FadeOutTime = Params.FadeOutTime or 0.25
 	local OutlineTransparency = Params.OutlineTransparency or 0.5
-	local Step = Params.Step or nil
 
 	local id = math.random()
 	self.Highlight = Target:FindFirstChild("HighlightEffect")
@@ -71,18 +71,25 @@ function Highlight:OnStart(Target, Params: HighlightParams)
 		new.FillTransparency = Transparency
 		new.Parent = Target
 		Highlight = new
+	else
+		Highlight.FillColor = Color
+		Highlight.OutlineColor = SubtractColor3(Color, 50)
+		Highlight.DepthMode = Enum.HighlightDepthMode.Occluded
+	end
+
+	Highlight.Enabled = true
+
+	if not Highlight then
+		return
 	end
 
 	Highlight:SetAttribute("id", id)
 
-	if Step == 0 then
-		local Stand = Target:FindFirstChild("Stand")
-		local HighlightEffect = Stand:FindFirstChild("HighlightEffect")
-		if HighlightEffect and HighlightEffect:IsA("Highlight") then
-			self:Destroy()
-		end
-	end
 	self.Highlight = Highlight
+
+	Highlight.FillTransparency = 1
+	Highlight.OutlineTransparency = 1
+
 
 	Tween(Highlight, FadeInTime, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, {
 		FillTransparency = Transparency,

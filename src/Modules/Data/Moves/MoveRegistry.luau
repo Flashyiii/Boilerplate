@@ -23,10 +23,36 @@ local function shallowClone(tbl)
 	return table.clone(tbl)
 end
 
+local function deepClone(tbl, seen)
+	seen = seen or {}
+	if seen[tbl] then
+		return seen[tbl]
+	end
+	
+	if not isPlainData(tbl) then
+		return tbl
+	end
+	
+	local clone = {}
+	seen[tbl] = clone
+	
+	for key, value in pairs(tbl) do
+		if isPlainData(value) then
+			clone[key] = deepClone(value, seen)
+		else
+			clone[key] = value
+		end
+	end
+	
+	return clone
+end
+
 local function deepMerge(target, source)
 	for key, value in pairs(source) do
 		if isPlainData(value) and isPlainData(target[key]) then
 			deepMerge(target[key], value)
+		elseif isPlainData(value) then
+			target[key] = deepClone(value)
 		else
 			target[key] = value
 		end
@@ -69,12 +95,10 @@ function MoveRegistry.get(movesetName: string)
 			if merged[moveName] then
 				deepMerge(merged[moveName], moveData)
 			else
-				merged[moveName] = shallowClone(moveData)
+				merged[moveName] = deepClone(moveData)
 			end
 		end
 	end
-
-	print(merged)
 
 	return merged
 end

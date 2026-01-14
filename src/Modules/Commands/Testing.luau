@@ -103,4 +103,25 @@ conch.register("Summon", {
 	end,
 })
 
+conch.register("Stun", {
+	description = "Stun a Player",
+	permissions = { "Stun" },
+	arguments = function()
+		return conch.args.player("target", "Target"),
+			conch.args.number("time", "Stun Time"),
+			conch.args.number("delay", "Delay Before Stun")
+	end,
+
+	callback = function(target, time, delay)
+		local TargetCharacter = target.Character
+		if TargetCharacter then
+			local Stun = require(ReplicatedStorage.Shared.Wcs.Conditions.States.Stun)
+			task.delay(delay, function()
+				local Target = wcs.Character.GetCharacterFromInstance(TargetCharacter)
+				Stun.new(Target):Start(time)
+			end)
+		end
+	end,
+})
+
 return Testing

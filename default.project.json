@@ -13,6 +13,12 @@
               "$path": "src/services/CommandService/Client.luau"
             }
           },
+          "CutsceneService": {
+            "$className": "Folder",
+            "CutsceneServiceClient": {
+              "$path": "src/services/CutsceneService/Client.luau"
+            }
+          },
           "InputService": {
             "$className": "Folder",
             "InputServiceClient": {
@@ -30,8 +36,8 @@
             "RagdollServiceClient": {
               "$path": "src/services/RagdollService/Client.luau"
             },
-            "Util": {
-              "$path": "src/services/RagdollService/Util.luau"
+            "RagdollUtil": {
+              "$path": "src/services/RagdollService/RagdollUtil.luau"
             }
           },
           "SpawnService": {
@@ -66,6 +72,9 @@
             "Datastore": {
               "$path": "src/Modules/Commands/Datastore.luau"
             },
+            "Dummies": {
+              "$path": "src/Modules/Commands/Dummies.luau"
+            },
             "Testing": {
               "$path": "src/Modules/Commands/Testing.luau"
             }
@@ -90,6 +99,12 @@
           },
           "Data": {
             "$className": "Folder",
+            "Inventory": {
+              "$className": "Folder",
+              "Items": {
+                "$path": "src/Modules/Data/Inventory/Items.luau"
+              }
+            },
             "Moves": {
               "$className": "Folder",
               "MoveRegistry": {
@@ -97,6 +112,9 @@
               },
               "Movesets": {
                 "$className": "Folder",
+                "Global": {
+                  "$path": "src/Modules/Data/Moves/Movesets/Global.luau"
+                },
                 "None": {
                   "$path": "src/Modules/Data/Moves/Movesets/None.luau"
                 },
@@ -108,6 +126,9 @@
                 "$className": "Folder",
                 "Combat": {
                   "$path": "src/Modules/Data/Moves/Sources/Combat.luau"
+                },
+                "Global": {
+                  "$path": "src/Modules/Data/Moves/Sources/Global.luau"
                 },
                 "Movement": {
                   "$path": "src/Modules/Data/Moves/Sources/Movement.luau"
@@ -121,13 +142,25 @@
                     "$path": "src/Modules/Data/Moves/Sources/Stands/TheWorld.luau"
                   }
                 }
+              },
+              "MovesTypes": {
+                "$path": "src/Modules/Data/Moves/Types.luau"
               }
             }
           },
           "Game": {
             "$className": "Folder",
+            "AnimationPlayer": {
+              "$path": "src/Modules/Game/AnimationPlayer"
+            },
             "ClientUtil": {
               "$path": "src/Modules/Game/ClientUtil.luau"
+            },
+            "CutscenePlayer": {
+              "$path": "src/Modules/Game/CutscenePlayer"
+            },
+            "KeyframesResearcher": {
+              "$path": "src/Modules/Game/KeyframesResearcher.luau"
             },
             "Preloader": {
               "$path": "src/Modules/Game/Preloader.luau"
@@ -141,8 +174,20 @@
             "DeepMerge": {
               "$path": "src/Modules/Helper/DeepMerge.luau"
             },
+            "mergeStyleData": {
+              "$path": "src/Modules/Helper/mergeStyleData.luau"
+            },
             "MergeTable": {
               "$path": "src/Modules/Helper/MergeTable.luau"
+            },
+            "shallowMerge": {
+              "$path": "src/Modules/Helper/shallowMerge.luau"
+            },
+            "SkillChainManager": {
+              "$path": "src/Modules/Helper/SkillChainManager.luau"
+            },
+            "TurnInvis": {
+              "$path": "src/Modules/Helper/TurnInvis.luau"
             },
             "VFXHelper": {
               "$path": "src/Modules/Helper/VFXHelper.luau"
@@ -156,16 +201,22 @@
             "CustomShaker": {
               "$path": "src/Modules/Utility/CustomShaker.luau"
             },
-            "Input": {
-              "$path": "src/Modules/Utility/Input.luau"
+            "InputManager": {
+              "$path": "src/Modules/Utility/InputManager.luau"
             },
             "KnockbackHandler": {
               "$path": "src/Modules/Utility/KnockbackHandler.luau"
+            },
+            "VFX": {
+              "$path": "src/Modules/Utility/VFX.luau"
             }
           }
         },
         "Visuals": {
           "$className": "Folder",
+          "DamageIndicator": {
+            "$path": "src/visuals/DamageIndicator.luau"
+          },
           "Highlight": {
             "$path": "src/visuals/Highlight.luau"
           },
@@ -179,11 +230,20 @@
             "$className": "Folder",
             "States": {
               "$className": "Folder",
+              "Attacking": {
+                "$path": "src/wcs/Conditions/States/Attacking.luau"
+              },
               "Busy": {
                 "$path": "src/wcs/Conditions/States/Busy.luau"
               },
+              "Carrying": {
+                "$path": "src/wcs/Conditions/States/Carrying.luau"
+              },
               "EndLag": {
                 "$path": "src/wcs/Conditions/States/EndLag.luau"
+              },
+              "Hit": {
+                "$path": "src/wcs/Conditions/States/Hit.luau"
               },
               "IFrame": {
                 "$path": "src/wcs/Conditions/States/IFrame.luau"
@@ -220,6 +280,9 @@
               },
               "M1": {
                 "$path": "src/wcs/Skills/Global/M1.luau"
+              },
+              "Run": {
+                "$path": "src/wcs/Skills/Global/Run.luau"
               },
               "Summon": {
                 "$path": "src/wcs/Skills/Global/Summon.luau"
@@ -266,6 +329,12 @@
           "$className": "Folder",
           "CommandServiceServer": {
             "$path": "src/services/CommandService/Server.luau"
+          }
+        },
+        "DamageService": {
+          "$className": "Folder",
+          "DamageServiceServer": {
+            "$path": "src/services/DamageService/Server.luau"
           }
         },
         "InputService": {

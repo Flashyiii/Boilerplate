@@ -9,6 +9,7 @@ Promise = "evaera/promise@4.0.0"
 refx = "wad4444/refx@0.3.0"
 
 maid = "flamenco687/maid@3.2.2"
+trove = "farukcoskn/trove@1.0.1"
 
 observer = "tazmondo/observer@0.3.4"
 
@@ -30,6 +31,7 @@ debug = "howmanysmall/debug@1.0.1"
 zoneplus = "mattschrubb/zoneplus@3.2.0"
 swagtext = "flashyiii/swagtext@0.1.0"
 
-wcs = "cheetiedotpy/wcs@2.4.0"
+wcs = "cheetiedotpy/wcs@2.5.0"
+
 
 [server-dependencies]

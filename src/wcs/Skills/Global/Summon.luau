@@ -4,16 +4,16 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local wcs = require(ReplicatedStorage.Packages.wcs)
 local MoveRegistry = require(ReplicatedStorage.Shared.Modules.Data.Moves.MoveRegistry)
 
-local Stun = require(ReplicatedStorage.Shared.Wcs.Conditions.States.Stun)
-local EndLagStatus = require(ReplicatedStorage.Shared.Wcs.Conditions.States.EndLag)
+local SkillBase = require(ReplicatedStorage.Shared.Wcs.Core.SkillBase)
 
 local Summon = wcs.RegisterSkill("Summon")
 
 function Summon:OnConstruct()
-	self.MutualExclusives = {
-		Stun,
-		EndLagStatus,
-	}
+	SkillBase.OnConstruct(self)
+end
+
+function Summon:CanCancel(): boolean
+	return false
 end
 
 function Summon:OnStartServer()

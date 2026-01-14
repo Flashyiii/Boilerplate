@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local wcs = require(ReplicatedStorage.Packages.wcs)
+
 local Stun = wcs.RegisterStatusEffect("Stun")
 
 function Stun:OnStartServer()

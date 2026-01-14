@@ -5,6 +5,8 @@ local Animations = {
 	["Fall"] = "rbxassetid://126636614272717",
 	["Land"] = "rbxassetid://81568717297655",
 	["Dash"] = "rbxassetid://112974340953828",
+	["Run"] = "rbxassetid://83773737198924",
+	["Jump"] = "rbxassetid://112974340953828",
 
 	["UnRagdoll"] = "rbxassetid://",
 
@@ -25,6 +27,14 @@ local Animations = {
 	["Summon"] = "rbxassetid://",
 	["UnSummon"] = "rbxassetid://",
 
+	["StandIdle"] = "",
+	["StandWalk"] = "",
+	["StandRun"] = "",
+
+	["BarrageStart"] = "rbxassetid://16028484159",
+	["BarrageLoop"] = "rbxassetid://16028484159",
+	["BarrageEnd"] = "rbxassetid://84252904538700",
+
 	["S1-1"] = "rbxassetid://16028469107",
 	["S1-2"] = "rbxassetid://16028484159",
 	["S1-3"] = "rbxassetid://16028497720",
@@ -33,6 +43,11 @@ local Animations = {
 
 	--* The World
 	["TheWorld-TimeStopPlayer"] = "rbxassetid://77033957771549",
+
+	--* Temporary
+	["RoadRollerAim"] = "rbxassetid://77033957771549",
+
+	["CutSceenTestingCamera"] = "rbxassetid://70617500882902",
 }
 
 return Animations

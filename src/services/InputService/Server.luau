@@ -1,4 +1,3 @@
--- ServerScriptService/Combat/Input/InputServiceServer.lua
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -12,17 +11,27 @@ InputServiceServer.__index = InputServiceServer
 
 local cache = {}
 local function getOrCreateWCSMoveset(movesetName)
+	if not movesetName or movesetName == "None" or movesetName == "" then
+		return nil
+	end
+
 	if cache[movesetName] then
 		return cache[movesetName]
 	end
 	local registry = MoveRegistry.get(movesetName)
 	if not registry then
-		return
+		return nil
 	end
 
 	local skills = {}
 	for _, moveData in pairs(registry) do
-		table.insert(skills, moveData.Skill)
+		if moveData.Skill then
+			table.insert(skills, moveData.Skill)
+		end
+	end
+
+	if #skills == 0 then
+		return nil
 	end
 
 	print("Generating moveset:", movesetName)
@@ -35,15 +44,45 @@ end
 function InputServiceServer:bindCharacter(character)
 	local function applyMoveset()
 		local movesetName = character.Instance:GetAttribute("Moveset")
-		if not movesetName then
-			return
-		end
 
 		character:ClearMoveset()
 
+		local globalMoveset = getOrCreateWCSMoveset("Global")
+		if globalMoveset then
+			character:ApplySkillsFromMoveset(globalMoveset)
+
+			local globalRegistry = MoveRegistry.get("Global")
+			if globalRegistry then
+				for moveName, moveData in pairs(globalRegistry) do
+					if moveData.Skill and moveName ~= "Summon" then
+						local skill = character:GetSkillFromConstructor(moveData.Skill)
+						if skill then
+							skill:ApplyCooldown(1)
+						end
+					end
+				end
+			end
+		end
+
+		if not movesetName or movesetName == "None" or movesetName == "" then
+			return
+		end
+
 		local moveset = getOrCreateWCSMoveset(movesetName)
 		if moveset then
-			character:ApplyMoveset(moveset)
+			character:ApplySkillsFromMoveset(moveset)
+
+			local registry = MoveRegistry.get(movesetName)
+			if registry then
+				for moveName, moveData in pairs(registry) do
+					if moveData.Skill and moveName ~= "Summon" then
+						local skill = character:GetSkillFromConstructor(moveData.Skill)
+						if skill then
+							skill:ApplyCooldown(1)
+						end
+					end
+				end
+			end
 		end
 	end
 
@@ -56,9 +95,7 @@ function InputServiceServer:bindCharacter(character)
 	end)
 end
 
-function InputServiceServer.init(self: InputServiceServer)
-	print("InputServiceServer initialized")
-end
+function InputServiceServer.init(self: InputServiceServer) end
 
 export type InputServiceServer = typeof(InputServiceServer) & {}
 

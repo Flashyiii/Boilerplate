@@ -69,6 +69,29 @@ local function AdjustSize(Model: Model, Size: number, dur: number?)
 	return connection
 end
 
+local function DisableStandCollisions(StandModel: Model)
+	for _, part in pairs(StandModel:GetDescendants()) do
+		if part:IsA("BasePart") then
+			part.CanCollide = false
+			part.CanTouch = false
+			part.Massless = true
+		elseif part:IsA("Humanoid") then
+			part.WalkSpeed = 0
+			part.JumpPower = 0
+			part.PlatformStand = true
+			part:SetStateEnabled(Enum.HumanoidStateType.Physics, false)
+			part:SetStateEnabled(Enum.HumanoidStateType.Freefall, false)
+			part:SetStateEnabled(Enum.HumanoidStateType.GettingUp, false)
+			part:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
+			part:SetStateEnabled(Enum.HumanoidStateType.Landed, false)
+			part:SetStateEnabled(Enum.HumanoidStateType.Running, false)
+			part:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics, false)
+			part:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+			part:ChangeState(Enum.HumanoidStateType.Physics)
+		end
+	end
+end
+
 function Summoned:OnConstruct()
 	self.MutualExclusives = {
 		Stun,
@@ -84,6 +107,7 @@ function Summoned:_newStand()
 	local success, err = pcall(function()
 		self.StandObject = ReplicatedStorage.Assets.StandModels[Stand]:Clone()
 	end)
+
 	if err then
 		self:End()
 		warn("No stand model found for moveset:", Stand)
@@ -92,6 +116,17 @@ function Summoned:_newStand()
 
 	self.StandObject.Parent = Character
 	self.StandObject:AddTag("Stand")
+
+	DisableStandCollisions(self.StandObject)
+
+	local ServerScriptService = game:GetService("ServerScriptService")
+	local collisionSuccess, CollisionService = pcall(function()
+		return require(ServerScriptService.Services.CollisionService.Server)
+	end)
+
+	if collisionSuccess and CollisionService and CollisionService.SetupStand then
+		CollisionService.SetupStand(self.StandObject)
+	end
 
 	self._maid:GiveTask(self.StandObject)
 	AdjustTransparency(self.StandObject, 1, 0, self._maid)
@@ -102,13 +137,14 @@ function Summoned:_newStand()
 		or self.StandObject:FindFirstChildWhichIsA("BasePart")
 
 	if HumanoidRootPart and StandRootPart then
-		self.StandObject:PivotTo(HumanoidRootPart.CFrame * CFrame.Angles(math.pi, 0, 0)) -- For some reason the stand is upside down by default
+		self.StandObject:PivotTo(HumanoidRootPart.CFrame * CFrame.Angles(math.pi, 0, 0))
 		self.StandObject:ScaleTo(0.05)
 
 		local weld = Instance.new("WeldConstraint")
 		weld.Part0 = StandRootPart
 		weld.Part1 = HumanoidRootPart
-		weld.Parent = HumanoidRootPart
+		weld.Parent = StandRootPart
+		self._maid:GiveTask(weld)
 	end
 
 	AdjustTransparency(self.StandObject, 0, Settings.SpawnTransparencyDuration, self._maid)
@@ -118,19 +154,21 @@ function Summoned:_newStand()
 
 	ClientUtil.PlaySound("Summon", Character.PrimaryPart, { Volume = 1, TimePosition = 0, Moveset = Stand })
 
-	local SummonFX = require(ReplicatedStorage.Shared.Visuals.SummonFX)
-	local Effect = SummonFX.new(self.Character.Instance)
-	Effect:Start(game.Players:GetPlayers())
+	task.spawn(function()
+		local SummonFX = require(ReplicatedStorage.Shared.Visuals.SummonFX)
+		local Effect = SummonFX.new(self.Character.Instance)
+		Effect:Start(game.Players:GetPlayers())
 
-	local highlightEffect = Highlight.new(self.Character.Instance, { Color = Color3.fromRGB(245, 180, 72) }) -- Player highlight
-	highlightEffect:Start(game.Players:GetPlayers())
+		local highlightEffect = Highlight.new(self.Character.Instance, { Color = Color3.fromRGB(245, 180, 72) }) -- Player highlight
+		highlightEffect:Start(game.Players:GetPlayers())
+	end)
 end
 
 function Summoned:OnStartServer()
 	local Character = self.Character.Instance
 
 	if CollectionService:HasTag(Character, "Summoned") then
-		print("Character", Character.Name, "is already summoned.")
+		warn("Character", Character.Name, "is already summoned.")
 	else
 		self:_newStand()
 		Character:AddTag("Summoned")
@@ -149,6 +187,7 @@ function Summoned:OnEndServer()
 	if self.StandObject then
 		AdjustTransparency(self.StandObject, 1, Settings.DespawnDuration, self._maid)
 	end
+
 	task.delay(Settings.DespawnDuration, function()
 		if self.StandObject then
 			self.StandObject:Destroy()
